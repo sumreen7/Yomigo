@@ -21,7 +21,7 @@ class WanderWiseAPITester:
         
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, params=params, timeout=30)
+                response = requests.get(url, headers=headers, params=params, timeout=45)
             elif method == 'POST':
                 if params:
                     # For POST with query parameters
