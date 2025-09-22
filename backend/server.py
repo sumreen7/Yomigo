@@ -285,8 +285,9 @@ async def create_personalized_itinerary(preferences: TravelPreferences):
         # Save recommendation
         recommendation = TravelRecommendation(
             user_preferences=preferences,
-            destinations=[],  # Will be populated from itinerary_data
-            itinerary=itinerary_data
+            destinations=itinerary_data.get("destination_recommendations", []),
+            itinerary=itinerary_data,
+            estimated_cost=itinerary_data.get("estimated_costs", {})
         )
         
         await db.travel_recommendations.insert_one(recommendation.dict())
