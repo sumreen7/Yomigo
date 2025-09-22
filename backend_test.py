@@ -50,7 +50,7 @@ class WanderWiseAPITester:
                 return False, {}
 
         except requests.exceptions.Timeout:
-            print(f"❌ Failed - Request timeout (30s)")
+            print(f"❌ Failed - Request timeout (45s)")
             return False, {}
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
