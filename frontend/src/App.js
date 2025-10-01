@@ -8,7 +8,7 @@ import { Textarea } from "./components/ui/textarea";
 import { Badge } from "./components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
-import { Loader2, MapPin, Clock, DollarSign, Heart, Star, Shield, Sparkles, Compass, Calendar } from "lucide-react";
+import { Loader2, MapPin, Clock, DollarSign, Heart, Star, Shield, Sparkles, Compass, Calendar, Route, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -69,7 +69,7 @@ const TravelHero = () => {
           </div>
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-amber-400" />
-            <span>Safety Insights</span>
+            <span>Safety Intelligence</span>
           </div>
         </div>
       </div>
@@ -83,6 +83,7 @@ const VibeDestinationMatcher = () => {
   const [budget, setBudget] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
+  const [generatingItinerary, setGeneratingItinerary] = useState({});
 
   const handleVibeMatch = async () => {
     if (!vibeQuery.trim()) {
@@ -105,6 +106,40 @@ const VibeDestinationMatcher = () => {
       toast.error("Failed to match destinations. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateItineraryForDestination = async (destination, index) => {
+    setGeneratingItinerary(prev => ({ ...prev, [index]: true }));
+    
+    try {
+      const preferences = {
+        destination_type: destinationType || "beach",
+        budget_range: budget || "mid-range", 
+        travel_style: "relaxed",
+        duration: 5,
+        activities: ["sightseeing", "local culture", "food tours"],
+        vibe: `${vibeQuery} - specifically for ${destination.name}, ${destination.country}`
+      };
+
+      const response = await axios.post(`${API}/smart-itinerary`, preferences, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      // Open itinerary in a new "tab" or modal - for now we'll show success and switch tabs
+      toast.success(`Perfect itinerary created for ${destination.name}! Check the Smart Itinerary tab.`);
+      
+      // Store the result in local storage so it can be accessed from other components
+      localStorage.setItem('generatedItinerary', JSON.stringify({
+        destination: destination.name,
+        itinerary: response.data.itinerary
+      }));
+      
+    } catch (error) {
+      console.error("Itinerary generation error:", error);
+      toast.error(`Failed to create itinerary for ${destination.name}`);
+    } finally {
+      setGeneratingItinerary(prev => ({ ...prev, [index]: false }));
     }
   };
 
@@ -208,10 +243,29 @@ const VibeDestinationMatcher = () => {
                       </div>
                     </div>
                     <p className="text-gray-700 mb-3">{destination.description}</p>
-                    <div className="bg-purple-50 p-3 rounded">
+                    <div className="bg-purple-50 p-3 rounded mb-4">
                       <p className="text-purple-800 font-medium">Perfect Match Because:</p>
                       <p className="text-purple-700">{destination.why_it_matches}</p>
                     </div>
+                    
+                    {/* Generate Itinerary Button */}
+                    <Button
+                      onClick={() => generateItineraryForDestination(destination, index)}
+                      disabled={generatingItinerary[index]}
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-2"
+                    >
+                      {generatingItinerary[index] ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating Itinerary...
+                        </>
+                      ) : (
+                        <>
+                          <Route className="w-4 h-4 mr-2" />
+                          Generate Itinerary for {destination.name}
+                        </>
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -235,6 +289,16 @@ const SmartItineraryBuilder = () => {
   const [loading, setLoading] = useState(false);
   const [itinerary, setItinerary] = useState(null);
 
+  // Check for generated itinerary from vibe matcher
+  useEffect(() => {
+    const storedItinerary = localStorage.getItem('generatedItinerary');
+    if (storedItinerary) {
+      const parsed = JSON.parse(storedItinerary);
+      setItinerary(parsed.itinerary);
+      localStorage.removeItem('generatedItinerary'); // Clear after loading
+    }
+  }, []);
+
   const activityOptions = [
     "sightseeing", "food tours", "adventure sports", "museums", "nightlife", 
     "shopping", "beaches", "hiking", "photography", "local culture"
@@ -257,11 +321,16 @@ const SmartItineraryBuilder = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API}/smart-itinerary`, preferences);
+      console.log("Sending preferences:", preferences);
+      const response = await axios.post(`${API}/smart-itinerary`, preferences, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      console.log("Response:", response.data);
       setItinerary(response.data.itinerary);
       toast.success("Your personalized itinerary is ready!");
     } catch (error) {
       console.error("Itinerary creation error:", error);
+      console.error("Error response:", error.response?.data);
       toast.error("Failed to create itinerary. Please try again.");
     } finally {
       setLoading(false);
@@ -422,7 +491,18 @@ const SmartItineraryBuilder = () => {
                     <Card key={day} className="border-l-4 border-l-blue-500">
                       <CardContent className="p-4">
                         <h5 className="font-bold text-blue-800 capitalize">{day.replace('_', ' ')}</h5>
-                        <p className="text-gray-700">{activities}</p>
+                        {typeof activities === 'object' && activities !== null ? (
+                          <div className="space-y-2 mt-2">
+                            {Object.entries(activities).map(([period, activity]) => (
+                              <div key={period} className="flex flex-col">
+                                <span className="font-medium text-blue-700 capitalize">{period}:</span>
+                                <span className="text-gray-700 ml-4">{activity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-700">{activities}</p>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -455,10 +535,45 @@ const SmartItineraryBuilder = () => {
   );
 };
 
-const ReviewAnalyzer = () => {
-  const [reviewText, setReviewText] = useState("");
+const SafetyIntelligence = () => {
+  const [selectedTool, setSelectedTool] = useState("destination");
   const [loading, setLoading] = useState(false);
-  const [analysis, setAnalysis] = useState(null);
+  const [results, setResults] = useState(null);
+
+  // Destination Safety Check
+  const [destinationQuery, setDestinationQuery] = useState("");
+
+  // Review Analysis
+  const [reviewText, setReviewText] = useState("");
+
+  const checkDestinationSafety = async () => {
+    if (!destinationQuery.trim()) {
+      toast.error("Please enter a destination!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Use the review analyzer with a prompt about destination safety
+      const safetyPrompt = `Please provide a comprehensive safety assessment for travelers visiting ${destinationQuery}. Include information about general safety, crime rates, areas to avoid, transportation safety, health considerations, and any current travel advisories.`;
+      
+      const params = new URLSearchParams();
+      params.append('review_text', safetyPrompt);
+      
+      const response = await axios.post(`${API}/analyze-review?${params.toString()}`);
+      setResults({
+        type: 'destination',
+        destination: destinationQuery,
+        analysis: response.data.analysis
+      });
+      toast.success(`Safety assessment completed for ${destinationQuery}!`);
+    } catch (error) {
+      console.error("Safety check error:", error);
+      toast.error("Failed to check destination safety. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const analyzeReview = async () => {
     if (!reviewText.trim() || reviewText.trim().length < 10) {
@@ -472,7 +587,10 @@ const ReviewAnalyzer = () => {
       params.append('review_text', reviewText);
       
       const response = await axios.post(`${API}/analyze-review?${params.toString()}`);
-      setAnalysis(response.data.analysis);
+      setResults({
+        type: 'review',
+        analysis: response.data.analysis
+      });
       toast.success("Review analysis completed!");
     } catch (error) {
       console.error("Review analysis error:", error);
@@ -496,64 +614,139 @@ const ReviewAnalyzer = () => {
     return 'text-red-600';
   };
 
+  const getScoreIcon = (score) => {
+    if (score >= 8) return <CheckCircle className="w-6 h-6 text-green-600" />;
+    if (score >= 6) return <AlertTriangle className="w-6 h-6 text-yellow-600" />;
+    return <XCircle className="w-6 h-6 text-red-600" />;
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader className="text-center bg-gradient-to-r from-blue-50 to-indigo-50">
         <CardTitle className="text-3xl text-blue-800 flex items-center justify-center gap-2">
           <Shield className="w-8 h-8 text-indigo-500" />
-          NLP Review Analyzer
+          Safety Intelligence Hub
         </CardTitle>
         <CardDescription className="text-lg text-blue-600">
-          Get AI-powered insights on safety, cleanliness, and sentiment from travel reviews
+          Get AI-powered safety insights for destinations and analyze travel reviews
         </CardDescription>
       </CardHeader>
       <CardContent className="p-8 space-y-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Travel Review to Analyze
-          </label>
-          <Textarea
-            placeholder="Paste a travel review here... (e.g., hotel review, restaurant review, destination experience)"
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            className="min-h-32 text-base"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            {reviewText.length} characters (minimum 10 required)
-          </p>
+        
+        {/* Tool Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card 
+            className={`cursor-pointer border-2 transition-all ${selectedTool === 'destination' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}
+            onClick={() => setSelectedTool('destination')}
+          >
+            <CardContent className="p-4 text-center">
+              <MapPin className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+              <h3 className="font-semibold text-blue-800">Destination Safety Check</h3>
+              <p className="text-sm text-blue-600">Get safety assessment for any destination</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`cursor-pointer border-2 transition-all ${selectedTool === 'review' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'}`}
+            onClick={() => setSelectedTool('review')}
+          >
+            <CardContent className="p-4 text-center">
+              <Star className="w-8 h-8 mx-auto mb-2 text-indigo-600" />
+              <h3 className="font-semibold text-indigo-800">Review Analyzer</h3>
+              <p className="text-sm text-indigo-600">Analyze safety & cleanliness from reviews</p>
+            </CardContent>
+          </Card>
         </div>
 
-        <Button 
-          onClick={analyzeReview} 
-          disabled={loading || reviewText.trim().length < 10}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Analyzing Review...
-            </>
-          ) : (
-            <>
-              <Shield className="w-4 h-4 mr-2" />
-              Analyze Review
-            </>
-          )}
-        </Button>
+        {/* Destination Safety Check Tool */}
+        {selectedTool === 'destination' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Destination to Check
+              </label>
+              <Input
+                placeholder="e.g., Bangkok Thailand, Paris France, New York City..."
+                value={destinationQuery}
+                onChange={(e) => setDestinationQuery(e.target.value)}
+                className="text-base"
+              />
+            </div>
 
-        {analysis && (
+            <Button 
+              onClick={checkDestinationSafety} 
+              disabled={loading || !destinationQuery.trim()}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing Safety...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Check Destination Safety
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Review Analysis Tool */}
+        {selectedTool === 'review' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Travel Review to Analyze
+              </label>
+              <Textarea
+                placeholder="Paste a travel review here... (hotel, restaurant, destination experience, etc.)"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                className="min-h-32 text-base"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                {reviewText.length} characters (minimum 10 required)
+              </p>
+            </div>
+
+            <Button 
+              onClick={analyzeReview} 
+              disabled={loading || reviewText.trim().length < 10}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing Review...
+                </>
+              ) : (
+                <>
+                  <Star className="w-4 h-4 mr-2" />
+                  Analyze Review Safety
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Results Display */}
+        {results && (
           <div className="mt-8 space-y-6">
-            <h3 className="text-2xl font-bold text-center text-blue-800">Analysis Results</h3>
+            <h3 className="text-2xl font-bold text-center text-blue-800">
+              {results.type === 'destination' ? `Safety Assessment: ${results.destination}` : 'Review Analysis Results'}
+            </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="border-l-4 border-l-blue-500">
                 <CardContent className="p-4 text-center">
                   <h4 className="font-semibold text-gray-800 mb-2">Overall Sentiment</h4>
-                  <Badge className={`text-lg px-4 py-2 ${getSentimentColor(analysis.overall_sentiment)}`}>
-                    {analysis.overall_sentiment?.toUpperCase()}
+                  <Badge className={`text-lg px-4 py-2 ${getSentimentColor(results.analysis.overall_sentiment)}`}>
+                    {results.analysis.overall_sentiment?.toUpperCase()}
                   </Badge>
                   <p className="text-sm text-gray-600 mt-2">
-                    Confidence: {Math.round(analysis.sentiment_confidence * 100)}%
+                    Confidence: {Math.round(results.analysis.sentiment_confidence * 100)}%
                   </p>
                 </CardContent>
               </Card>
@@ -561,13 +754,16 @@ const ReviewAnalyzer = () => {
               <Card className="border-l-4 border-l-green-500">
                 <CardContent className="p-4 text-center">
                   <h4 className="font-semibold text-gray-800 mb-2">Safety Score</h4>
-                  <div className={`text-3xl font-bold ${getScoreColor(analysis.safety_score)}`}>
-                    {analysis.safety_score}/10
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    {getScoreIcon(results.analysis.safety_score)}
+                    <div className={`text-3xl font-bold ${getScoreColor(results.analysis.safety_score)}`}>
+                      {results.analysis.safety_score}/10
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ width: `${analysis.safety_score * 10}%` }}
+                      className="bg-green-600 h-2 rounded-full transition-all duration-500" 
+                      style={{ width: `${results.analysis.safety_score * 10}%` }}
                     ></div>
                   </div>
                 </CardContent>
@@ -576,29 +772,32 @@ const ReviewAnalyzer = () => {
               <Card className="border-l-4 border-l-purple-500">
                 <CardContent className="p-4 text-center">
                   <h4 className="font-semibold text-gray-800 mb-2">Cleanliness Score</h4>
-                  <div className={`text-3xl font-bold ${getScoreColor(analysis.cleanliness_score)}`}>
-                    {analysis.cleanliness_score}/10
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    {getScoreIcon(results.analysis.cleanliness_score)}
+                    <div className={`text-3xl font-bold ${getScoreColor(results.analysis.cleanliness_score)}`}>
+                      {results.analysis.cleanliness_score}/10
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-purple-600 h-2 rounded-full" 
-                      style={{ width: `${analysis.cleanliness_score * 10}%` }}
+                      className="bg-purple-600 h-2 rounded-full transition-all duration-500" 
+                      style={{ width: `${results.analysis.cleanliness_score * 10}%` }}
                     ></div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {analysis.key_insights && analysis.key_insights.length > 0 && (
+            {results.analysis.key_insights && results.analysis.key_insights.length > 0 && (
               <Card className="border-l-4 border-l-amber-500">
                 <CardHeader>
-                  <CardTitle className="text-lg text-amber-800">🔍 Key Insights</CardTitle>
+                  <CardTitle className="text-lg text-amber-800">🔍 Key Safety Insights</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {analysis.key_insights.map((insight, index) => (
+                    {results.analysis.key_insights.map((insight, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <Star className="w-4 h-4 text-amber-500 mt-1 flex-shrink-0" />
+                        <Shield className="w-4 h-4 text-amber-500 mt-1 flex-shrink-0" />
                         <span className="text-gray-700">{insight}</span>
                       </li>
                     ))}
@@ -607,49 +806,15 @@ const ReviewAnalyzer = () => {
               </Card>
             )}
 
-            {analysis.recommendation && (
+            {results.analysis.recommendation && (
               <Card className="border-l-4 border-l-indigo-500">
                 <CardHeader>
                   <CardTitle className="text-lg text-indigo-800">💡 AI Recommendation</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700">{analysis.recommendation}</p>
+                  <p className="text-gray-700">{results.analysis.recommendation}</p>
                 </CardContent>
               </Card>
-            )}
-
-            {(analysis.safety_mentions || analysis.cleanliness_mentions) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {analysis.safety_mentions && (
-                  <Card className="border-l-4 border-l-green-500">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-green-800">🛡️ Safety Mentions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {analysis.safety_mentions.map((mention, index) => (
-                          <li key={index} className="text-sm text-gray-600">• {mention}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {analysis.cleanliness_mentions && (
-                  <Card className="border-l-4 border-l-purple-500">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-purple-800">🧹 Cleanliness Mentions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {analysis.cleanliness_mentions.map((mention, index) => (
-                          <li key={index} className="text-sm text-gray-600">• {mention}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
             )}
           </div>
         )}
@@ -688,8 +853,8 @@ function App() {
                 <TabsTrigger value="itinerary" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-lg py-3">
                   📅 Smart Itinerary
                 </TabsTrigger>
-                <TabsTrigger value="analyzer" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg py-3">
-                  🔍 Review Analyzer
+                <TabsTrigger value="safety" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg py-3">
+                  🛡️ Safety Intelligence
                 </TabsTrigger>
               </TabsList>
 
@@ -701,8 +866,8 @@ function App() {
                 <SmartItineraryBuilder />
               </TabsContent>
 
-              <TabsContent value="analyzer" className="space-y-8">
-                <ReviewAnalyzer />
+              <TabsContent value="safety" className="space-y-8">
+                <SafetyIntelligence />
               </TabsContent>
             </Tabs>
           </div>
