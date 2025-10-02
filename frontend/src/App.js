@@ -841,6 +841,17 @@ const SafetyIntelligence = () => {
 function App() {
   const [activeTab, setActiveTab] = useState("hero");
 
+  // Make tab switching available globally for itinerary generation
+  useEffect(() => {
+    window.switchToItineraryTab = () => {
+      setActiveTab("itinerary");
+    };
+    
+    return () => {
+      delete window.switchToItineraryTab;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {activeTab === "hero" && <TravelHero />}
