@@ -169,31 +169,64 @@ async def create_smart_itinerary(preferences: TravelPreferences) -> Dict[str, An
     message = UserMessage(text=prompt)
     
     try:
-        response_text = str(response)
-        json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-        if json_match:
-            return json.loads(json_match.group())
-        else:
-            # Fallback itinerary
-            return {
-                "destination_recommendations": [
-                    {
-                        "name": f"Perfect {preferences.destination_type.title()} Destination",
-                        "description": f"Ideal for {preferences.travel_style} travelers",
-                        "why_recommended": f"Matches your {preferences.vibe} vibe perfectly"
-                    }
-                ],
-                "daily_itinerary": {
-                    f"day_1": f"Arrival and {preferences.travel_style} exploration",
-                    f"day_2": f"Experience local {preferences.destination_type} activities"
-                },
-                "estimated_costs": {
-                    "accommodation": f"${100 if preferences.budget_range == 'budget' else 200 if preferences.budget_range == 'mid-range' else 400}/night",
-                    "activities": f"${50 if preferences.budget_range == 'budget' else 100 if preferences.budget_range == 'mid-range' else 200}/day"
-                }
+        # Add timeout handling
+        import asyncio
+        
+        async def get_ai_response():
+            return await claude_chat.send_message(message)
+        
+        # Try to get AI response with 20 second timeout
+        try:
+            response = await asyncio.wait_for(get_ai_response(), timeout=20.0)
+            response_text = str(response)
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                parsed_result = json.loads(json_match.group())
+                return parsed_result
+        except asyncio.TimeoutError:
+            logging.warning("Claude AI timed out, using fallback itinerary")
+        except Exception as e:
+            logging.warning(f"Claude AI error: {str(e)}, using fallback")
+        
+        # Enhanced fallback itinerary
+        duration = preferences.duration
+        days_dict = {}
+        for i in range(1, min(duration + 1, 8)):  # Limit to 7 days max
+            days_dict[f"day_{i}"] = {
+                "morning": f"Day {i} morning: Explore local {preferences.destination_type} attractions",
+                "afternoon": f"Day {i} afternoon: {preferences.travel_style} activities and local cuisine", 
+                "evening": f"Day {i} evening: Relax and enjoy the {preferences.vibe} atmosphere"
             }
-    except:
-        return {"error": "Unable to create itinerary"}
+        
+        return {
+            "destination_recommendations": [
+                {
+                    "name": f"Perfect {preferences.destination_type.title()} Destination",
+                    "description": f"Ideal {preferences.destination_type} location for {preferences.travel_style} travelers seeking {preferences.vibe} experiences",
+                    "highlights": [f"Amazing {preferences.destination_type} scenery", "Local culture", "Great food scene"]
+                },
+                {
+                    "name": f"Alternative {preferences.destination_type.title()} Spot", 
+                    "description": f"Another excellent {preferences.destination_type} destination with {preferences.travel_style} vibes",
+                    "highlights": ["Unique attractions", f"{preferences.budget_range} friendly", "Perfect for your style"]
+                }
+            ],
+            "daily_itinerary": days_dict,
+            "estimated_costs": {
+                "accommodation": f"${80 if preferences.budget_range == 'budget' else 150 if preferences.budget_range == 'mid-range' else 300}/night",
+                "meals": f"${30 if preferences.budget_range == 'budget' else 60 if preferences.budget_range == 'mid-range' else 120}/day",
+                "activities": f"${40 if preferences.budget_range == 'budget' else 80 if preferences.budget_range == 'mid-range' else 160}/day"
+            },
+            "local_tips": [
+                f"Best time to visit {preferences.destination_type} destinations varies by location",
+                f"For {preferences.travel_style} travelers, pack comfortable clothing", 
+                f"Research local customs and {preferences.budget_range} dining options",
+                "Consider travel insurance and check visa requirements"
+            ]
+        }
+    except Exception as e:
+        logging.error(f"Itinerary creation failed: {str(e)}")
+        return {"error": f"Unable to create itinerary: {str(e)}"}
 
 async def analyze_review_sentiment(review_text: str) -> Dict[str, Any]:
     """Analyze travel review for sentiment, safety, and cleanliness"""
