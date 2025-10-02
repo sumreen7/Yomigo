@@ -140,29 +140,33 @@ async def analyze_travel_vibe(vibe_description: str, preferences: dict) -> Dict[
         }
 
 async def create_smart_itinerary(preferences: TravelPreferences) -> Dict[str, Any]:
-    """Create personalized itinerary using Claude"""
+    """Create personalized itinerary using Claude with timeout handling"""
+    
+    # Simplified prompt for faster response
     prompt = f"""
-    Create a detailed {preferences.duration}-day travel itinerary for:
-    - Destination Type: {preferences.destination_type}
-    - Budget: {preferences.budget_range}  
-    - Style: {preferences.travel_style}
-    - Activities: {', '.join(preferences.activities)}
-    - Vibe: {preferences.vibe}
+    Create a {preferences.duration}-day {preferences.destination_type} itinerary. Budget: {preferences.budget_range}, Style: {preferences.travel_style}.
+
+    Return JSON with:
+    {{
+        "destination_recommendations": [
+            {{"name": "Destination Name", "description": "Brief description", "highlights": ["key attraction 1", "key attraction 2"]}}
+        ],
+        "daily_itinerary": {{
+            "day_1": {{"morning": "Activity", "afternoon": "Activity", "evening": "Activity"}},
+            "day_2": {{"morning": "Activity", "afternoon": "Activity", "evening": "Activity"}}
+        }},
+        "estimated_costs": {{
+            "accommodation": "$X-Y per night",
+            "meals": "$X-Y per day", 
+            "activities": "$X-Y per day"
+        }},
+        "local_tips": ["tip 1", "tip 2"]
+    }}
     
-    Provide a JSON response with:
-    1. destination_recommendations: Top 3 specific destinations
-    2. daily_itinerary: Day-by-day activities
-    3. accommodation_suggestions: Different budget options
-    4. transport_recommendations: How to get around
-    5. estimated_costs: Breakdown by category
-    6. local_tips: Cultural insights and tips
-    7. must_try_experiences: Unique experiences
-    
-    Make it personalized and exciting!
+    Keep it concise but helpful for {preferences.vibe} travelers.
     """
     
     message = UserMessage(text=prompt)
-    response = await claude_chat.send_message(message)
     
     try:
         response_text = str(response)
