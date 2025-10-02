@@ -122,22 +122,37 @@ const VibeDestinationMatcher = () => {
         vibe: `${vibeQuery} - specifically for ${destination.name}, ${destination.country}`
       };
 
+      console.log("Generating itinerary for:", destination.name);
+      console.log("Preferences:", preferences);
+
       const response = await axios.post(`${API}/smart-itinerary`, preferences, {
         headers: { 'Content-Type': 'application/json' }
       });
       
-      // Open itinerary in a new "tab" or modal - for now we'll show success and switch tabs
-      toast.success(`Perfect itinerary created for ${destination.name}! Check the Smart Itinerary tab.`);
+      console.log("Itinerary response:", response.data);
       
       // Store the result in local storage so it can be accessed from other components
       localStorage.setItem('generatedItinerary', JSON.stringify({
         destination: destination.name,
-        itinerary: response.data.itinerary
+        itinerary: response.data.itinerary,
+        preferences: preferences
       }));
+      
+      // Show success message
+      toast.success(`🎉 Perfect itinerary created for ${destination.name}! Switching to Smart Itinerary tab...`);
+      
+      // Add a small delay then switch to itinerary tab
+      setTimeout(() => {
+        // Trigger tab change - we need to pass this function from parent
+        if (window.switchToItineraryTab) {
+          window.switchToItineraryTab();
+        }
+      }, 1500);
       
     } catch (error) {
       console.error("Itinerary generation error:", error);
-      toast.error(`Failed to create itinerary for ${destination.name}`);
+      console.error("Error details:", error.response?.data);
+      toast.error(`❌ Failed to create itinerary for ${destination.name}. Please try again.`);
     } finally {
       setGeneratingItinerary(prev => ({ ...prev, [index]: false }));
     }
