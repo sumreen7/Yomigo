@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
+
+// Add axios defaults for better error handling
+axios.defaults.timeout = 30000; // 30 seconds
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('Axios error:', error);
+    return Promise.reject(error);
+  }
+);
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
