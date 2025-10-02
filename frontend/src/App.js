@@ -337,16 +337,46 @@ const SmartItineraryBuilder = () => {
     setLoading(true);
     try {
       console.log("Sending preferences:", preferences);
-      const response = await axios.post(`${API}/smart-itinerary`, preferences, {
-        headers: { 'Content-Type': 'application/json' }
+      
+      // Ensure all required fields are properly formatted
+      const cleanPreferences = {
+        destination_type: preferences.destination_type,
+        budget_range: preferences.budget_range,
+        travel_style: preferences.travel_style,
+        duration: preferences.duration || 7,
+        activities: preferences.activities || [],
+        vibe: preferences.vibe || "relaxing and enjoyable"
+      };
+      
+      console.log("Clean preferences:", cleanPreferences);
+      
+      const response = await axios.post(`${API}/smart-itinerary`, cleanPreferences, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 30000 // 30 second timeout
       });
+      
       console.log("Response:", response.data);
-      setItinerary(response.data.itinerary);
-      toast.success("Your personalized itinerary is ready!");
+      
+      if (response.data && response.data.itinerary) {
+        setItinerary(response.data.itinerary);
+        toast.success("🎉 Your personalized itinerary is ready!");
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
       console.error("Itinerary creation error:", error);
       console.error("Error response:", error.response?.data);
-      toast.error("Failed to create itinerary. Please try again.");
+      
+      let errorMessage = "Failed to create itinerary. Please try again.";
+      if (error.response?.status === 500) {
+        errorMessage = "Server error. Our AI is having trouble - please try again in a moment.";
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = "Request timed out. Please try again with simpler preferences.";
+      } else if (error.response?.data?.detail) {
+        errorMessage = `Error: ${error.response.data.detail}`;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
