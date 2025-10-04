@@ -822,48 +822,97 @@ const SmartItineraryBuilder = () => {
           </div>
         )}
 
-        {itinerary && (
+        {/* Step 4: Final Itinerary */}
+        {step === 4 && itinerary && (
           <div className="mt-8 space-y-6">
-            <h3 className="text-2xl font-bold text-center text-emerald-800">Your Personalized Itinerary</h3>
-            
-            {itinerary.destination_recommendations && (
-              <div>
-                <h4 className="text-xl font-semibold mb-4 text-gray-800">🏖️ Recommended Destinations</h4>
-                <div className="grid gap-4">
-                  {itinerary.destination_recommendations.map((dest, index) => (
-                    <Card key={index} className="border-l-4 border-l-emerald-500">
-                      <CardContent className="p-4">
-                        <h5 className="font-bold text-lg text-emerald-800">{dest.name}</h5>
-                        <p className="text-gray-700">{dest.description}</p>
-                        {dest.why_recommended && (
-                          <p className="text-emerald-700 mt-2 font-medium">✨ {dest.why_recommended}</p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-emerald-800">
+                Your {selectedDestination?.name} Itinerary
+              </h3>
+              <Button variant="outline" onClick={resetBuilder}>
+                ✨ Create New Itinerary
+              </Button>
+            </div>
+
+            {/* Destination Info */}
+            {itinerary.destination_info && (
+              <Card className="border-l-4 border-l-emerald-500">
+                <CardContent className="p-6">
+                  <h4 className="text-xl font-bold text-emerald-800 mb-2">{itinerary.destination_info.name}</h4>
+                  <p className="text-gray-700 mb-3">{itinerary.destination_info.description}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    {itinerary.destination_info.best_time_to_visit && (
+                      <div>
+                        <span className="font-semibold text-gray-800">Best Time:</span>
+                        <p className="text-gray-600">{itinerary.destination_info.best_time_to_visit}</p>
+                      </div>
+                    )}
+                    {itinerary.destination_info.local_currency && (
+                      <div>
+                        <span className="font-semibold text-gray-800">Currency:</span>
+                        <p className="text-gray-600">{itinerary.destination_info.local_currency}</p>
+                      </div>
+                    )}
+                    {itinerary.destination_info.language && (
+                      <div>
+                        <span className="font-semibold text-gray-800">Language:</span>
+                        <p className="text-gray-600">{itinerary.destination_info.language}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
+            {/* Daily Itinerary */}
             {itinerary.daily_itinerary && (
               <div>
-                <h4 className="text-xl font-semibold mb-4 text-gray-800">📅 Daily Itinerary</h4>
-                <div className="grid gap-3">
-                  {Object.entries(itinerary.daily_itinerary).map(([day, activities]) => (
+                <h4 className="text-xl font-semibold mb-4 text-gray-800">📅 Daily Schedule</h4>
+                <div className="space-y-4">
+                  {Object.entries(itinerary.daily_itinerary).map(([day, dayActivities]) => (
                     <Card key={day} className="border-l-4 border-l-blue-500">
-                      <CardContent className="p-4">
-                        <h5 className="font-bold text-blue-800 capitalize">{day.replace('_', ' ')}</h5>
-                        {typeof activities === 'object' && activities !== null ? (
-                          <div className="space-y-2 mt-2">
-                            {Object.entries(activities).map(([period, activity]) => (
-                              <div key={period} className="flex flex-col">
-                                <span className="font-medium text-blue-700 capitalize">{period}:</span>
-                                <span className="text-gray-700 ml-4">{activity}</span>
+                      <CardContent className="p-6">
+                        <h5 className="font-bold text-lg text-blue-800 mb-4 capitalize">
+                          {day.replace('_', ' ')}
+                        </h5>
+                        {typeof dayActivities === 'object' && dayActivities !== null ? (
+                          <div className="space-y-4">
+                            {Object.entries(dayActivities).map(([period, activity]) => (
+                              <div key={period} className="flex gap-4">
+                                <div className="flex-shrink-0 w-20">
+                                  <Badge variant="outline" className="capitalize">
+                                    {period}
+                                  </Badge>
+                                </div>
+                                <div className="flex-1">
+                                  {typeof activity === 'object' && activity !== null ? (
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-semibold text-gray-800">{activity.activity}</span>
+                                        {activity.time && (
+                                          <Badge variant="secondary" className="text-xs">
+                                            {activity.time}
+                                          </Badge>
+                                        )}
+                                        {activity.cost && (
+                                          <Badge variant="secondary" className="text-xs text-green-700">
+                                            {activity.cost}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      {activity.description && (
+                                        <p className="text-gray-600 text-sm">{activity.description}</p>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-gray-700">{activity}</span>
+                                  )}
+                                </div>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-gray-700">{activities}</p>
+                          <p className="text-gray-700">{dayActivities}</p>
                         )}
                       </CardContent>
                     </Card>
@@ -872,16 +921,17 @@ const SmartItineraryBuilder = () => {
               </div>
             )}
 
+            {/* Estimated Costs */}
             {itinerary.estimated_costs && (
               <div>
-                <h4 className="text-xl font-semibold mb-4 text-gray-800">💰 Estimated Costs</h4>
+                <h4 className="text-xl font-semibold mb-4 text-gray-800">💰 Budget Breakdown</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(itinerary.estimated_costs).map(([category, cost]) => (
                     <Card key={category} className="border-l-4 border-l-yellow-500">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2">
                           <DollarSign className="w-5 h-5 text-yellow-600" />
-                          <span className="font-semibold capitalize">{category}:</span>
+                          <span className="font-semibold capitalize">{category.replace('_', ' ')}:</span>
                           <span className="text-yellow-700 font-bold">{cost}</span>
                         </div>
                       </CardContent>
@@ -889,6 +939,43 @@ const SmartItineraryBuilder = () => {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Local Tips */}
+            {itinerary.local_tips && itinerary.local_tips.length > 0 && (
+              <Card className="border-l-4 border-l-amber-500">
+                <CardHeader>
+                  <CardTitle className="text-lg text-amber-800">💡 Local Tips</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {itinerary.local_tips.map((tip, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Star className="w-4 h-4 text-amber-500 mt-1 flex-shrink-0" />
+                        <span className="text-gray-700">{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Packing Suggestions */}
+            {itinerary.packing_suggestions && itinerary.packing_suggestions.length > 0 && (
+              <Card className="border-l-4 border-l-purple-500">
+                <CardHeader>
+                  <CardTitle className="text-lg text-purple-800">🎒 Packing Suggestions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {itinerary.packing_suggestions.map((item, index) => (
+                      <Badge key={index} variant="outline" className="text-purple-700">
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}
