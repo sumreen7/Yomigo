@@ -178,6 +178,102 @@ class WanderWiseAPITester:
             200
         )
 
+    def test_destination_suggestions(self):
+        """Test destination suggestions endpoint"""
+        params = {
+            'destination_type': 'mountain',
+            'budget_range': 'mid-range',
+            'travel_style': 'adventure',
+            'vibe': 'cultural temples and street food in Asia',
+            'travel_month': 'March'
+        }
+        
+        success, response = self.run_test(
+            "Destination Suggestions",
+            "POST",
+            "destination-suggestions",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            destinations = response.get('destinations', [])
+            print(f"   Destinations Found: {len(destinations)}")
+            if destinations:
+                print(f"   First Destination: {destinations[0].get('name', 'N/A')}")
+        
+        return success
+
+    def test_activity_suggestions(self):
+        """Test activity suggestions endpoint"""
+        params = {
+            'destination': 'Bangkok Thailand',
+            'travel_style': 'adventure',
+            'budget_range': 'mid-range',
+            'travel_month': 'March',
+            'duration': 5
+        }
+        
+        success, response = self.run_test(
+            "Activity Suggestions",
+            "POST",
+            "activity-suggestions",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            activities = response.get('activities', {})
+            seasonal = activities.get('seasonal_activities', [])
+            year_round = activities.get('year_round_activities', [])
+            print(f"   Seasonal Activities: {len(seasonal)}")
+            print(f"   Year-round Activities: {len(year_round)}")
+        
+        return success
+
+    def test_currency_conversion(self):
+        """Test currency conversion endpoint"""
+        params = {
+            'amount': 100,
+            'from_currency': 'USD',
+            'to_currency': 'THB'
+        }
+        
+        success, response = self.run_test(
+            "Currency Conversion",
+            "GET",
+            "convert-currency",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            print(f"   Original: {response.get('original_amount', 'N/A')} {response.get('from_currency', 'N/A')}")
+            print(f"   Converted: {response.get('converted_amount', 'N/A')} {response.get('to_currency', 'N/A')}")
+            print(f"   Exchange Rate: {response.get('exchange_rate', 'N/A')}")
+        
+        return success
+
+    def test_destination_currency(self):
+        """Test destination currency lookup"""
+        params = {
+            'destination': 'Bangkok Thailand'
+        }
+        
+        success, response = self.run_test(
+            "Destination Currency Lookup",
+            "GET",
+            "destination-currency",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            print(f"   Destination: {response.get('destination', 'N/A')}")
+            print(f"   Currency: {response.get('currency', 'N/A')}")
+        
+        return success
+
 def main():
     print("🚀 Starting WanderWise AI Travel Platform API Tests")
     print("=" * 60)
