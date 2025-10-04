@@ -272,9 +272,38 @@ const ItineraryPage = () => {
           </Button>
           <Button variant="outline" onClick={downloadItinerary} className="flex items-center gap-2">
             <Download className="w-4 h-4" />
-            Download PDF
+            Download Itinerary
           </Button>
         </div>
+
+        {/* Currency Converter */}
+        {localCurrency !== "USD" && (
+          <div className="max-w-md mx-auto mb-8">
+            <Card className="shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Local Currency</h4>
+                    <p className="text-sm text-gray-600">Convert costs to {localCurrency}</p>
+                  </div>
+                  <Button 
+                    onClick={() => convertCurrency(localCurrency)}
+                    disabled={currencyLoading}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    {currencyLoading ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <DollarSign className="w-4 h-4" />
+                    )}
+                    Convert to {localCurrency}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="max-w-6xl mx-auto space-y-8">
           
