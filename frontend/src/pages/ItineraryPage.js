@@ -409,15 +409,30 @@ const ItineraryPage = () => {
               </CardHeader>
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {Object.entries(itinerary.estimated_costs).map(([category, cost]) => (
+                  {Object.entries(convertedCosts || itinerary.estimated_costs).map(([category, cost]) => (
                     <div key={category} className="bg-yellow-50 p-6 rounded-xl text-center">
                       <h4 className="font-semibold text-gray-800 text-lg mb-2 capitalize">
                         {category.replace('_', ' ')}
                       </h4>
                       <p className="text-2xl font-bold text-yellow-700">{cost}</p>
+                      {convertedCosts && (
+                        <p className="text-xs text-gray-500 mt-1">Local currency</p>
+                      )}
                     </div>
                   ))}
                 </div>
+                {convertedCosts && (
+                  <div className="text-center mt-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setConvertedCosts(null)}
+                      className="text-sm"
+                    >
+                      Show Original (USD)
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
