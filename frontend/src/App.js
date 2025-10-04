@@ -339,7 +339,7 @@ const SmartItineraryBuilder = () => {
     "shopping", "beaches", "hiking", "photography", "local culture"
   ];
 
-  const toggleActivity = (activity) => {
+  const togglePreferenceActivity = (activity) => {
     setPreferences(prev => ({
       ...prev,
       activities: prev.activities.includes(activity)
