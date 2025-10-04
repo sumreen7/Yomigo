@@ -303,15 +303,25 @@ const VibeDestinationMatcher = () => {
 };
 
 const SmartItineraryBuilder = () => {
+  const [step, setStep] = useState(1); // 1: Preferences, 2: Destinations, 3: Activities, 4: Itinerary
   const [preferences, setPreferences] = useState({
     destination_type: "",
     budget_range: "",
     travel_style: "",
-    duration: 7,
+    duration: "7",
     activities: [],
-    vibe: ""
+    vibe: "",
+    travel_dates: {
+      start_date: "",
+      end_date: "",
+      travel_month: ""
+    }
   });
   const [loading, setLoading] = useState(false);
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [activitySuggestions, setActivitySuggestions] = useState(null);
+  const [selectedActivities, setSelectedActivities] = useState([]);
   const [itinerary, setItinerary] = useState(null);
 
   // Check for generated itinerary from vibe matcher
