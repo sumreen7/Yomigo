@@ -923,9 +923,16 @@ const SmartItineraryBuilder = () => {
         {step === 4 && itinerary && (
           <div className="mt-8 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-emerald-800">
-                Your {selectedDestination?.name} Itinerary
-              </h3>
+              <div>
+                <h3 className="text-2xl font-bold text-emerald-800">
+                  Your {selectedDestination?.name || 'Personalized'} Itinerary
+                </h3>
+                {localStorage.getItem('vibeGeneratedItinerary') === null && selectedDestination?.name && (
+                  <p className="text-emerald-600 text-sm mt-1">
+                    ✨ Generated from your vibe match preferences
+                  </p>
+                )}
+              </div>
               <Button variant="outline" onClick={resetBuilder}>
                 ✨ Create New Itinerary
               </Button>
