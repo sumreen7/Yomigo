@@ -287,7 +287,11 @@ def main():
         tester.test_smart_itinerary,
         tester.test_review_analysis,
         tester.test_review_analysis_short_text,
-        tester.test_travel_insights
+        tester.test_travel_insights,
+        tester.test_destination_suggestions,
+        tester.test_activity_suggestions,
+        tester.test_currency_conversion,
+        tester.test_destination_currency
     ]
     
     for test in tests:
