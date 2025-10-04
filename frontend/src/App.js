@@ -484,7 +484,7 @@ const SmartItineraryBuilder = () => {
       
       const response = await axios.post(`${API}/smart-itinerary`, requestData, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 30000
+        timeout: 60000 // Increased to 60 seconds for AI processing
       });
       
       console.log("Itinerary response:", response.data);
