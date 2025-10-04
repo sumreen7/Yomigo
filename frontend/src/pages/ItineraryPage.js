@@ -23,11 +23,72 @@ const ItineraryPage = () => {
     if (storedItinerary) {
       const parsed = JSON.parse(storedItinerary);
       setItineraryData(parsed);
+      
+      // Get local currency for destination
+      if (parsed.destination?.name) {
+        getDestinationCurrency(parsed.destination.name);
+      }
     } else {
       // If no itinerary, redirect to vibe match
       navigate('/vibe-match');
     }
   }, [navigate]);
+
+  const getDestinationCurrency = async (destination) => {
+    try {
+      const response = await axios.get(`${API}/destination-currency?destination=${encodeURIComponent(destination)}`);
+      if (response.data.success) {
+        setLocalCurrency(response.data.currency);
+      }
+    } catch (error) {
+      console.error("Failed to get destination currency:", error);
+    }
+  };
+
+  const convertCurrency = async (targetCurrency) => {
+    if (!itineraryData?.itinerary?.estimated_costs) return;
+    
+    setCurrencyLoading(true);
+    try {
+      const costs = itineraryData.itinerary.estimated_costs;
+      const converted = {};
+      
+      for (const [category, cost] of Object.entries(costs)) {
+        // Extract numeric values from cost strings like "$120-250 per night"
+        const matches = cost.match(/\$(\d+)(?:-(\d+))?/);
+        if (matches) {
+          const minAmount = parseInt(matches[1]);
+          const maxAmount = matches[2] ? parseInt(matches[2]) : minAmount;
+          
+          const minResponse = await axios.get(`${API}/convert-currency?amount=${minAmount}&from_currency=USD&to_currency=${targetCurrency}`);
+          const maxResponse = await axios.get(`${API}/convert-currency?amount=${maxAmount}&from_currency=USD&to_currency=${targetCurrency}`);
+          
+          if (minResponse.data.success && maxResponse.data.success) {
+            const minConverted = Math.round(minResponse.data.converted_amount);
+            const maxConverted = Math.round(maxResponse.data.converted_amount);
+            
+            if (minAmount === maxAmount) {
+              converted[category] = `${minConverted} ${targetCurrency}${cost.includes('per') ? cost.substring(cost.indexOf(' per')) : ''}`;
+            } else {
+              converted[category] = `${minConverted}-${maxConverted} ${targetCurrency}${cost.includes('per') ? cost.substring(cost.indexOf(' per')) : ''}`;
+            }
+          } else {
+            converted[category] = cost; // Keep original if conversion fails
+          }
+        } else {
+          converted[category] = cost; // Keep original if no numeric value found
+        }
+      }
+      
+      setConvertedCosts(converted);
+      toast.success(`Costs converted to ${targetCurrency}!`);
+    } catch (error) {
+      console.error("Currency conversion failed:", error);
+      toast.error("Failed to convert currency");
+    } finally {
+      setCurrencyLoading(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
