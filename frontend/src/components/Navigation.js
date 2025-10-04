@@ -14,6 +14,7 @@ const Navigation = () => {
 
   const navItems = [
     { path: '/vibe-match', icon: Heart, label: 'Vibe Match', color: 'text-purple-600' },
+    { path: '/plan-direct', icon: Calendar, label: 'Plan Trip', color: 'text-emerald-600' },
     { path: '/itinerary', icon: Calendar, label: 'My Itinerary', color: 'text-emerald-600' },
     { path: '/safety', icon: Shield, label: 'Safety Intel', color: 'text-blue-600' },
   ];
