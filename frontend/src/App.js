@@ -467,12 +467,57 @@ const SmartItineraryBuilder = () => {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Duration (days)</label>
             <Input
-              type="number"
-              min="1"
-              max="30"
+              type="text"
+              placeholder="e.g., 7"
               value={preferences.duration}
-              onChange={(e) => setPreferences(prev => ({ ...prev, duration: parseInt(e.target.value) || 7 }))}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Allow only numbers and limit to reasonable range
+                if (/^\d*$/.test(value) && (value === "" || (parseInt(value) >= 1 && parseInt(value) <= 30))) {
+                  setPreferences(prev => ({ ...prev, duration: value }));
+                }
+              }}
+              className="text-center"
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Travel Dates</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                <Input
+                  type="date"
+                  value={preferences.travel_dates.start_date}
+                  onChange={(e) => {
+                    const startDate = e.target.value;
+                    const month = new Date(startDate).toLocaleDateString('en-US', { month: 'long' });
+                    setPreferences(prev => ({ 
+                      ...prev, 
+                      travel_dates: { 
+                        ...prev.travel_dates, 
+                        start_date: startDate,
+                        travel_month: month
+                      }
+                    }));
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">End Date</label>
+                <Input
+                  type="date"
+                  value={preferences.travel_dates.end_date}
+                  onChange={(e) => setPreferences(prev => ({ 
+                    ...prev, 
+                    travel_dates: { 
+                      ...prev.travel_dates, 
+                      end_date: e.target.value
+                    }
+                  }))}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="md:col-span-2">
