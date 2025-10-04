@@ -19,6 +19,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/vibe-match" element={<VibeMatchPage />} />
           <Route path="/destinations" element={<DestinationSelectionPage />} />
+          <Route path="/plan-direct" element={<PlanDirectPage />} />
           <Route path="/itinerary" element={<ItineraryPage />} />
           <Route path="/safety" element={<SafetyPage />} />
         </Routes>
