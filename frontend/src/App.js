@@ -548,8 +548,13 @@ const SmartItineraryBuilder = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Budget Range *</label>
-            <Select value={preferences.budget_range} onValueChange={(value) => 
-              setPreferences(prev => ({ ...prev, budget_range: value }))}>
+            <Select 
+              value={preferences.budget_range} 
+              onValueChange={(value) => {
+                console.log("Budget range selected:", value);
+                setPreferences(prev => ({ ...prev, budget_range: value }));
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select budget" />
               </SelectTrigger>
