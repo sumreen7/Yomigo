@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Compass, Calendar, Shield } from "lucide-react";
+import { Sparkles, Compass, Calendar, Shield, Heart } from "lucide-react";
 import { Button } from "../components/ui/button";
 
 const HomePage = () => {
