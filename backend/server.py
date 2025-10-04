@@ -389,7 +389,7 @@ async def analyze_review_sentiment(review_text: str) -> Dict[str, Any]:
                 "cleanliness_mentions": ["Standard cleanliness mentioned"],
                 "recommendation": "Further analysis recommended"
             }
-    except:
+    except Exception:
         return {
             "overall_sentiment": "neutral", 
             "sentiment_confidence": 0.5,
