@@ -228,6 +228,128 @@ async def create_smart_itinerary(preferences: TravelPreferences) -> Dict[str, An
         logging.error(f"Itinerary creation failed: {str(e)}")
         return {"error": f"Unable to create itinerary: {str(e)}"}
 
+async def create_smart_itinerary_for_destination(
+    destination: str, 
+    preferences: TravelPreferences, 
+    selected_activities: List[str] = [], 
+    travel_dates: Optional[Dict[str, str]] = None
+) -> Dict[str, Any]:
+    """Create personalized itinerary for a specific destination"""
+    
+    # Build enhanced prompt with destination and activities
+    activities_text = ", ".join(selected_activities) if selected_activities else "general activities"
+    dates_text = f"from {travel_dates.get('start_date')} to {travel_dates.get('end_date')}" if travel_dates else "flexible dates"
+    
+    prompt = f"""
+    Create a detailed {preferences.duration}-day itinerary for {destination}.
+    Travel dates: {dates_text}
+    Budget: {preferences.budget_range}
+    Style: {preferences.travel_style}
+    Vibe: {preferences.vibe}
+    Preferred activities: {activities_text}
+    
+    Return JSON with:
+    {{
+        "destination_info": {{
+            "name": "{destination}",
+            "description": "Brief overview",
+            "best_time_to_visit": "Season info",
+            "local_currency": "Currency",
+            "language": "Primary language"
+        }},
+        "daily_itinerary": {{
+            "day_1": {{
+                "morning": {{"activity": "Activity name", "time": "9:00 AM", "cost": "$XX", "description": "Details"}},
+                "afternoon": {{"activity": "Activity name", "time": "2:00 PM", "cost": "$XX", "description": "Details"}},
+                "evening": {{"activity": "Activity name", "time": "7:00 PM", "cost": "$XX", "description": "Details"}}
+            }}
+        }},
+        "estimated_costs": {{
+            "accommodation": "$X-Y per night",
+            "meals": "$X-Y per day",
+            "activities": "$X-Y per day",
+            "transportation": "$X-Y total"
+        }},
+        "local_tips": ["tip 1", "tip 2"],
+        "packing_suggestions": ["item 1", "item 2"]
+    }}
+    """
+    
+    message = UserMessage(text=prompt)
+    
+    try:
+        # Try to get AI response with timeout
+        async def get_ai_response():
+            return await claude_chat.send_message(message)
+        
+        try:
+            response = await asyncio.wait_for(get_ai_response(), timeout=25.0)
+            response_text = str(response)
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                parsed_result = json.loads(json_match.group())
+                return parsed_result
+        except asyncio.TimeoutError:
+            logging.warning("Claude AI timed out, using enhanced fallback itinerary")
+        except Exception as e:
+            logging.warning(f"Claude AI error: {str(e)}, using enhanced fallback")
+        
+        # Enhanced fallback itinerary with destination-specific content
+        duration = preferences.duration
+        days_dict = {}
+        for i in range(1, min(duration + 1, 8)):
+            days_dict[f"day_{i}"] = {
+                "morning": {
+                    "activity": f"Explore {destination} highlights",
+                    "time": "9:00 AM",
+                    "cost": "$20-40",
+                    "description": f"Visit top attractions in {destination}"
+                },
+                "afternoon": {
+                    "activity": f"{preferences.travel_style.title()} activities",
+                    "time": "2:00 PM", 
+                    "cost": "$30-60",
+                    "description": f"Enjoy {preferences.travel_style} experiences"
+                },
+                "evening": {
+                    "activity": f"Local dining and {preferences.vibe} atmosphere",
+                    "time": "7:00 PM",
+                    "cost": "$25-50",
+                    "description": f"Experience the {preferences.vibe} nightlife"
+                }
+            }
+        
+        return {
+            "destination_info": {
+                "name": destination,
+                "description": f"Beautiful destination perfect for {preferences.travel_style} travelers",
+                "best_time_to_visit": "Year-round destination with seasonal highlights",
+                "local_currency": "Local currency",
+                "language": "Local language"
+            },
+            "daily_itinerary": days_dict,
+            "estimated_costs": {
+                "accommodation": f"${80 if preferences.budget_range == 'budget' else 150 if preferences.budget_range == 'mid-range' else 300}/night",
+                "meals": f"${30 if preferences.budget_range == 'budget' else 60 if preferences.budget_range == 'mid-range' else 120}/day",
+                "activities": f"${40 if preferences.budget_range == 'budget' else 80 if preferences.budget_range == 'mid-range' else 160}/day",
+                "transportation": f"${100 if preferences.budget_range == 'budget' else 200 if preferences.budget_range == 'mid-range' else 400} total"
+            },
+            "local_tips": [
+                f"Research local customs and etiquette in {destination}",
+                f"Best {preferences.travel_style} spots are often recommended by locals",
+                f"Consider {preferences.budget_range} dining options for authentic experiences",
+                "Download offline maps and translation apps"
+            ],
+            "packing_suggestions": [
+                "Comfortable walking shoes",
+                "Weather-appropriate clothing",
+                "Portable charger and adapters",
+                "Travel insurance documents"
+            ]
+        }
+    except Exception as e:
+        logging.error(f"Enhanced itinerary creation failed: {str(e)}")
+        return {"error": f"Unable to create itinerary for {destination}: {str(e)}"}
 async def analyze_review_sentiment(review_text: str) -> Dict[str, Any]:
     """Analyze travel review for sentiment, safety, and cleanliness"""
     prompt = f"""
