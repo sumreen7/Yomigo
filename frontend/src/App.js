@@ -562,31 +562,15 @@ const SmartItineraryBuilder = () => {
             </Select>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Duration (days)</label>
-            <Input
-              type="text"
-              placeholder="e.g., 7"
-              value={preferences.duration}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Allow only numbers and limit to reasonable range
-                if (/^\d*$/.test(value) && (value === "" || (parseInt(value) >= 1 && parseInt(value) <= 30))) {
-                  setPreferences(prev => ({ ...prev, duration: value }));
-                }
-              }}
-              className="text-center"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Travel Dates</label>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="md:col-span-3">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Travel Dates *</label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">Start Date</label>
                 <Input
                   type="date"
                   value={preferences.travel_dates.start_date}
+                  min={new Date().toISOString().split('T')[0]} // Can't select past dates
                   onChange={(e) => {
                     const startDate = e.target.value;
                     const month = new Date(startDate).toLocaleDateString('en-US', { month: 'long' });
@@ -606,6 +590,7 @@ const SmartItineraryBuilder = () => {
                 <Input
                   type="date"
                   value={preferences.travel_dates.end_date}
+                  min={preferences.travel_dates.start_date || new Date().toISOString().split('T')[0]}
                   onChange={(e) => setPreferences(prev => ({ 
                     ...prev, 
                     travel_dates: { 
@@ -615,7 +600,24 @@ const SmartItineraryBuilder = () => {
                   }))}
                 />
               </div>
+              <div className="flex items-end">
+                <div className="bg-emerald-50 p-3 rounded-lg w-full">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-emerald-700">
+                      {calculateDuration()}
+                    </div>
+                    <div className="text-sm text-emerald-600">
+                      {calculateDuration() === 1 ? 'Day' : 'Days'}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            {preferences.travel_dates.start_date && preferences.travel_dates.end_date && (
+              <p className="text-sm text-gray-600 mt-2">
+                Trip duration: {calculateDuration()} days ({preferences.travel_dates.travel_month})
+              </p>
+            )}
           </div>
 
           <div className="md:col-span-2">
