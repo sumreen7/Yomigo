@@ -308,7 +308,6 @@ const SmartItineraryBuilder = () => {
     destination_type: "",
     budget_range: "",
     travel_style: "",
-    duration: "7",
     activities: [],
     vibe: "",
     travel_dates: {
@@ -317,6 +316,18 @@ const SmartItineraryBuilder = () => {
       travel_month: ""
     }
   });
+
+  // Calculate duration from travel dates
+  const calculateDuration = () => {
+    if (preferences.travel_dates.start_date && preferences.travel_dates.end_date) {
+      const start = new Date(preferences.travel_dates.start_date);
+      const end = new Date(preferences.travel_dates.end_date);
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+      return Math.max(1, Math.min(30, diffDays)); // Between 1-30 days
+    }
+    return 7; // Default duration
+  };
   const [loading, setLoading] = useState(false);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState(null);
