@@ -282,6 +282,31 @@ const DestinationSelectionPage = () => {
                 </Select>
               </div>
 
+              {/* Activity Selection */}
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Activities & Interests</h3>
+                <p className="text-sm text-gray-600 mb-4">Select activities you'd like to include in your itinerary (optional)</p>
+                <div className="flex flex-wrap gap-3">
+                  {activityOptions.map(activity => (
+                    <Badge
+                      key={activity}
+                      variant={selectedActivities.includes(activity) ? "default" : "outline"}
+                      className={`cursor-pointer px-4 py-2 text-base transition-all ${
+                        selectedActivities.includes(activity) 
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                          : 'hover:bg-emerald-50 hover:border-emerald-300'
+                      }`}
+                      onClick={() => toggleActivity(activity)}
+                    >
+                      {activity}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  {selectedActivities.length} activities selected
+                </p>
+              </div>
+
               {/* Generate Button */}
               <div className="md:col-span-2 mt-6">
                 <Button 
@@ -298,6 +323,7 @@ const DestinationSelectionPage = () => {
                     <>
                       <Sparkles className="w-6 h-6 mr-2" />
                       Generate My {destinationData.selectedDestination.name} Itinerary
+                      {selectedActivities.length > 0 && ` (${selectedActivities.length} activities)`}
                     </>
                   )}
                 </Button>
