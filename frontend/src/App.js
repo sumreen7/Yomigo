@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
+import { AuthProvider } from "./contexts/AuthContext";
 import Navigation from "./components/Navigation";
 import HomePage from "./pages/HomePage";
 import VibeMatchPage from "./pages/VibeMatchPage";
@@ -8,6 +9,8 @@ import DestinationSelectionPage from "./pages/DestinationSelectionPage";
 import ItineraryPage from "./pages/ItineraryPage";
 import SafetyPage from "./pages/SafetyPage";
 import PlanDirectPage from "./pages/PlanDirectPage";
+import LoginPage from "./pages/LoginPage";
+import MyTripsPage from "./pages/MyTripsPage";
 import { Toaster } from "sonner";
 
 function App() {
