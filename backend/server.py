@@ -580,38 +580,25 @@ async def get_activity_suggestions(
         raise HTTPException(status_code=500, detail=f"Failed to get activities: {str(e)}")
 
 @api_router.post("/smart-itinerary", response_model=Dict[str, Any])
-async def create_personalized_itinerary(
-    destination: str,
-    preferences: TravelPreferences,
-    selected_activities: List[str] = [],
-    travel_dates: Optional[Dict[str, str]] = None
-):
-    """Create detailed itinerary for selected destination"""
+async def create_personalized_itinerary(preferences: TravelPreferences):
+    """Create detailed itinerary - simplified to match frontend"""
     try:
-        # Enhanced preferences with destination
-        enhanced_preferences = preferences.dict()
-        enhanced_preferences["selected_destination"] = destination
-        enhanced_preferences["selected_activities"] = selected_activities
-        enhanced_preferences["travel_dates"] = travel_dates
+        logging.info(f"Creating itinerary with preferences: {preferences.dict()}")
         
-        itinerary_data = await create_smart_itinerary_for_destination(
-            destination, preferences, selected_activities, travel_dates
-        )
+        itinerary_data = await create_smart_itinerary(preferences)
         
         # Save recommendation
         recommendation = TravelRecommendation(
             user_preferences=preferences,
-            destinations=[{"name": destination}],
-            itinerary=itinerary_data,
-            estimated_cost=itinerary_data.get("estimated_costs", {})
+            destinations=[],
+            itinerary=itinerary_data
         )
         
         await db.travel_recommendations.insert_one(recommendation.dict())
         
         return {
             "success": True,
-            "destination": destination,
-            "preferences": enhanced_preferences,
+            "preferences": preferences.dict(),
             "itinerary": itinerary_data
         }
         
