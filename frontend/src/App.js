@@ -348,7 +348,7 @@ const SmartItineraryBuilder = () => {
     }));
   };
 
-  const createItinerary = async () => {
+  const getDestinationSuggestions = async () => {
     if (!preferences.destination_type || !preferences.budget_range || !preferences.travel_style) {
       toast.error("Please fill in the required fields!");
       return;
@@ -356,50 +356,120 @@ const SmartItineraryBuilder = () => {
 
     setLoading(true);
     try {
-      console.log("Sending preferences:", preferences);
+      const params = new URLSearchParams();
+      params.append('destination_type', preferences.destination_type);
+      params.append('budget_range', preferences.budget_range);
+      params.append('travel_style', preferences.travel_style);
+      params.append('vibe', preferences.vibe);
+      if (preferences.travel_dates.travel_month) {
+        params.append('travel_month', preferences.travel_dates.travel_month);
+      }
+
+      const response = await axios.post(`${API}/destination-suggestions?${params.toString()}`);
       
-      // Ensure all required fields are properly formatted
-      const cleanPreferences = {
-        destination_type: preferences.destination_type,
-        budget_range: preferences.budget_range,
-        travel_style: preferences.travel_style,
-        duration: preferences.duration || 7,
-        activities: preferences.activities || [],
-        vibe: preferences.vibe || "relaxing and enjoyable"
-      };
-      
-      console.log("Clean preferences:", cleanPreferences);
-      
-      const response = await axios.post(`${API}/smart-itinerary`, cleanPreferences, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 30000 // 30 second timeout
-      });
-      
-      console.log("Response:", response.data);
-      
-      if (response.data && response.data.itinerary) {
-        setItinerary(response.data.itinerary);
-        toast.success("🎉 Your personalized itinerary is ready!");
+      if (response.data && response.data.destinations) {
+        setDestinationSuggestions(response.data.destinations);
+        setStep(2);
+        toast.success("Found perfect destinations for you!");
       } else {
         throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error("Itinerary creation error:", error);
-      console.error("Error response:", error.response?.data);
-      
-      let errorMessage = "Failed to create itinerary. Please try again.";
-      if (error.response?.status === 500) {
-        errorMessage = "Server error. Our AI is having trouble - please try again in a moment.";
-      } else if (error.code === 'ECONNABORTED') {
-        errorMessage = "Request timed out. Please try again with simpler preferences.";
-      } else if (error.response?.data?.detail) {
-        errorMessage = `Error: ${error.response.data.detail}`;
-      }
-      
-      toast.error(errorMessage);
+      console.error("Destination suggestions error:", error);
+      toast.error("Failed to get destination suggestions. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const selectDestination = async (destination) => {
+    setSelectedDestination(destination);
+    setLoading(true);
+    
+    try {
+      const params = new URLSearchParams();
+      params.append('destination', destination.name);
+      params.append('travel_style', preferences.travel_style);
+      params.append('budget_range', preferences.budget_range);
+      params.append('travel_month', preferences.travel_dates.travel_month || 'any');
+      params.append('duration', preferences.duration || '7');
+
+      const response = await axios.post(`${API}/activity-suggestions?${params.toString()}`);
+      
+      if (response.data && response.data.activities) {
+        setActivitySuggestions(response.data.activities);
+        setStep(3);
+        toast.success(`Got activity suggestions for ${destination.name}!`);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Activity suggestions error:", error);
+      toast.error("Failed to get activity suggestions. Proceeding without activities.");
+      setStep(4);
+      createFinalItinerary();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleActivity = (activity) => {
+    setSelectedActivities(prev => 
+      prev.find(a => a.name === activity.name)
+        ? prev.filter(a => a.name !== activity.name)
+        : [...prev, activity]
+    );
+  };
+
+  const createFinalItinerary = async () => {
+    if (!selectedDestination) {
+      toast.error("Please select a destination first!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const itineraryData = {
+        destination: selectedDestination.name,
+        preferences: {
+          destination_type: preferences.destination_type,
+          budget_range: preferences.budget_range,
+          travel_style: preferences.travel_style,
+          duration: parseInt(preferences.duration) || 7,
+          activities: selectedActivities.map(a => a.name),
+          vibe: preferences.vibe || "relaxing and enjoyable"
+        },
+        selected_activities: selectedActivities.map(a => a.name),
+        travel_dates: preferences.travel_dates
+      };
+      
+      const response = await axios.post(`${API}/smart-itinerary`, itineraryData, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 30000
+      });
+      
+      if (response.data && response.data.itinerary) {
+        setItinerary(response.data.itinerary);
+        setStep(4);
+        toast.success(`🎉 Your ${selectedDestination.name} itinerary is ready!`);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Final itinerary creation error:", error);
+      toast.error("Failed to create itinerary. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetBuilder = () => {
+    setStep(1);
+    setDestinationSuggestions([]);
+    setSelectedDestination(null);
+    setActivitySuggestions(null);
+    setSelectedActivities([]);
+    setItinerary(null);
   };
 
   return (
