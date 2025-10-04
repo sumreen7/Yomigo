@@ -15,20 +15,24 @@ import { Toaster } from "sonner";
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/vibe-match" element={<VibeMatchPage />} />
-          <Route path="/destinations" element={<DestinationSelectionPage />} />
-          <Route path="/plan-direct" element={<PlanDirectPage />} />
-          <Route path="/itinerary" element={<ItineraryPage />} />
-          <Route path="/safety" element={<SafetyPage />} />
-        </Routes>
-        <Toaster position="top-right" />
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/vibe-match" element={<VibeMatchPage />} />
+            <Route path="/destinations" element={<DestinationSelectionPage />} />
+            <Route path="/plan-direct" element={<PlanDirectPage />} />
+            <Route path="/itinerary" element={<ItineraryPage />} />
+            <Route path="/safety" element={<SafetyPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/my-trips" element={<MyTripsPage />} />
+          </Routes>
+          <Toaster position="top-right" />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
