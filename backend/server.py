@@ -420,10 +420,215 @@ async def analyze_review_sentiment(review_text: str) -> Dict[str, Any]:
             "recommendation": "Manual review needed"
         }
 
+# Helper functions for auth
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(password: str, password_hash: str) -> bool:
+    return hashlib.sha256(password.encode()).hexdigest() == password_hash
+
+def generate_session_token() -> str:
+    return secrets.token_urlsafe(32)
+
 # API Endpoints
 @api_router.get("/")
 async def root():
-    return {"message": "WanderWise AI Travel Platform API", "version": "1.0.0"}
+    return {"message": "Yomigo Travel Platform API", "version": "1.0.0"}
+
+# Authentication Endpoints
+@api_router.post("/auth/register", response_model=Dict[str, Any])
+async def register_user(email: str, password: str, name: str):
+    """Register a new user"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({"email": email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create new user
+        password_hash = hash_password(password)
+        user = User(
+            email=email,
+            password_hash=password_hash,
+            name=name
+        )
+        
+        await db.users.insert_one(user.dict())
+        
+        # Generate session token
+        session_token = generate_session_token()
+        session = {
+            "user_id": user.id,
+            "token": session_token,
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow().replace(day=datetime.utcnow().day + 30)  # 30 day expiry
+        }
+        await db.sessions.insert_one(session)
+        
+        return {
+            "success": True,
+            "user": {"id": user.id, "email": user.email, "name": user.name},
+            "session_token": session_token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Registration error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+
+@api_router.post("/auth/login", response_model=Dict[str, Any])
+async def login_user(email: str, password: str):
+    """Login user"""
+    try:
+        user = await db.users.find_one({"email": email})
+        if not user or not verify_password(password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Generate session token
+        session_token = generate_session_token()
+        session = {
+            "user_id": user["id"],
+            "token": session_token,
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow().replace(day=datetime.utcnow().day + 30)
+        }
+        await db.sessions.insert_one(session)
+        
+        return {
+            "success": True,
+            "user": {"id": user["id"], "email": user["email"], "name": user["name"]},
+            "session_token": session_token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@api_router.post("/auth/verify", response_model=Dict[str, Any])
+async def verify_session(session_token: str):
+    """Verify session token"""
+    try:
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Check if session expired
+        if datetime.utcnow() > session["expires_at"]:
+            await db.sessions.delete_one({"token": session_token})
+            raise HTTPException(status_code=401, detail="Session expired")
+        
+        user = await db.users.find_one({"id": session["user_id"]})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return {
+            "success": True,
+            "user": {"id": user["id"], "email": user["email"], "name": user["name"]}
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Session verification error: {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+# Saved Itinerary Endpoints
+@api_router.post("/itineraries/save", response_model=Dict[str, Any])
+async def save_itinerary(
+    session_token: str,
+    title: str,
+    destination: Dict[str, Any],
+    itinerary_data: Dict[str, Any],
+    travel_dates: Dict[str, Any],
+    preferences: Dict[str, Any]
+):
+    """Save itinerary for user"""
+    try:
+        # Verify session
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Create saved itinerary
+        saved_itinerary = SavedItinerary(
+            user_id=session["user_id"],
+            title=title,
+            destination=destination,
+            itinerary_data=itinerary_data,
+            travel_dates=travel_dates,
+            preferences=preferences
+        )
+        
+        await db.saved_itineraries.insert_one(saved_itinerary.dict())
+        
+        return {
+            "success": True,
+            "itinerary_id": saved_itinerary.id,
+            "message": "Itinerary saved successfully!"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Save itinerary error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save itinerary: {str(e)}")
+
+@api_router.get("/itineraries/my", response_model=Dict[str, Any])
+async def get_my_itineraries(session_token: str):
+    """Get user's saved itineraries"""
+    try:
+        # Verify session
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Get user's itineraries
+        itineraries = await db.saved_itineraries.find(
+            {"user_id": session["user_id"]}
+        ).sort("created_at", -1).to_list(50)
+        
+        return {
+            "success": True,
+            "itineraries": itineraries
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get itineraries error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get itineraries: {str(e)}")
+
+@api_router.delete("/itineraries/{itinerary_id}", response_model=Dict[str, Any])
+async def delete_itinerary(itinerary_id: str, session_token: str):
+    """Delete saved itinerary"""
+    try:
+        # Verify session
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Delete itinerary (only if owned by user)
+        result = await db.saved_itineraries.delete_one({
+            "id": itinerary_id,
+            "user_id": session["user_id"]
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Itinerary not found")
+        
+        return {
+            "success": True,
+            "message": "Itinerary deleted successfully!"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Delete itinerary error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete itinerary: {str(e)}")
 
 @api_router.post("/vibe-match", response_model=Dict[str, Any])
 async def match_vibe_destinations(vibe_query: str, destination_type: Optional[str] = None, budget: Optional[str] = None):
