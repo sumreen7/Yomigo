@@ -611,7 +611,7 @@ const SmartItineraryBuilder = () => {
                       ? 'bg-emerald-600 hover:bg-emerald-700' 
                       : 'hover:bg-emerald-50'
                   }`}
-                  onClick={() => toggleActivity(activity)}
+                  onClick={() => togglePreferenceActivity(activity)}
                 >
                   {activity}
                 </Badge>
