@@ -414,7 +414,7 @@ const SmartItineraryBuilder = () => {
       params.append('travel_style', preferences.travel_style);
       params.append('budget_range', preferences.budget_range);
       params.append('travel_month', preferences.travel_dates.travel_month || 'any');
-      params.append('duration', preferences.duration || '7');
+      params.append('duration', calculateDuration().toString());
 
       const response = await axios.post(`${API}/activity-suggestions?${params.toString()}`);
       
