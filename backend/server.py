@@ -132,7 +132,7 @@ async def analyze_travel_vibe(vibe_description: str, preferences: dict) -> Dict[
                 "vibe_score": 0.8,
                 "reasoning": "Based on your vibe preferences, these destinations offer the perfect atmosphere."
             }
-    except:
+    except Exception:
         return {
             "matched_destinations": [],
             "vibe_score": 0.5,
