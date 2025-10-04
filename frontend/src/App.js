@@ -7,6 +7,7 @@ import VibeMatchPage from "./pages/VibeMatchPage";
 import DestinationSelectionPage from "./pages/DestinationSelectionPage";
 import ItineraryPage from "./pages/ItineraryPage";
 import SafetyPage from "./pages/SafetyPage";
+import PlanDirectPage from "./pages/PlanDirectPage";
 import { Toaster } from "sonner";
 
 function App() {
