@@ -689,17 +689,7 @@ const SmartItineraryBuilder = () => {
           </div>
 
           {step === 1 && (
-            <div className="md:col-span-3 space-y-4">
-              {/* Debug info - remove in production */}
-              <div className="bg-gray-100 p-3 rounded-lg text-sm">
-                <p className="font-semibold mb-2">Form State (Debug):</p>
-                <p>Destination: {preferences.destination_type || 'Not selected'}</p>
-                <p>Budget: {preferences.budget_range || 'Not selected'}</p>
-                <p>Style: {preferences.travel_style || 'Not selected'}</p>
-                <p>Dates: {preferences.travel_dates.start_date || 'Not set'} → {preferences.travel_dates.end_date || 'Not set'}</p>
-                <p>Duration: {calculateDuration()} days</p>
-              </div>
-              
+            <div className="md:col-span-3">
               <Button 
                 onClick={getDestinationSuggestions} 
                 disabled={loading}
