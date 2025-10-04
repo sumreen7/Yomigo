@@ -526,8 +526,13 @@ const SmartItineraryBuilder = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Destination Type *</label>
-            <Select value={preferences.destination_type} onValueChange={(value) => 
-              setPreferences(prev => ({ ...prev, destination_type: value }))}>
+            <Select 
+              value={preferences.destination_type} 
+              onValueChange={(value) => {
+                console.log("Destination type selected:", value);
+                setPreferences(prev => ({ ...prev, destination_type: value }));
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Choose destination type" />
               </SelectTrigger>
