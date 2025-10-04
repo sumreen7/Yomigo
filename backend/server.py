@@ -640,6 +640,119 @@ async def analyze_travel_review(review_text: str):
         logging.error(f"Review analysis error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Review analysis failed: {str(e)}")
 
+@api_router.get("/convert-currency", response_model=Dict[str, Any])
+async def convert_currency(amount: float, from_currency: str = "USD", to_currency: str = "USD"):
+    """Convert currency using exchange rates"""
+    try:
+        # Simplified currency conversion - in production, use a real API like exchangerate.host
+        exchange_rates = {
+            "USD": 1.0,
+            "EUR": 0.85,
+            "GBP": 0.73,
+            "JPY": 110.0,
+            "AUD": 1.35,
+            "CAD": 1.25,
+            "CHF": 0.92,
+            "CNY": 6.45,
+            "INR": 74.5,
+            "THB": 31.0,
+            "MXN": 20.0,
+            "BRL": 5.2,
+            "KRW": 1180.0,
+            "SGD": 1.35,
+            "HKD": 7.8,
+            "NOK": 8.5,
+            "SEK": 8.8,
+            "DKK": 6.3,
+            "PLN": 3.9,
+            "CZK": 21.5,
+            "HUF": 295.0,
+            "RUB": 73.0,
+            "TRY": 8.5,
+            "ZAR": 14.2,
+            "EGP": 15.7,
+            "AED": 3.67,
+            "SAR": 3.75,
+        }
+        
+        if from_currency not in exchange_rates or to_currency not in exchange_rates:
+            return {
+                "success": False,
+                "error": f"Currency {from_currency} or {to_currency} not supported"
+            }
+        
+        # Convert to USD first, then to target currency
+        usd_amount = amount / exchange_rates[from_currency]
+        converted_amount = usd_amount * exchange_rates[to_currency]
+        
+        return {
+            "success": True,
+            "original_amount": amount,
+            "from_currency": from_currency,
+            "to_currency": to_currency,
+            "converted_amount": round(converted_amount, 2),
+            "exchange_rate": round(exchange_rates[to_currency] / exchange_rates[from_currency], 4)
+        }
+        
+    except Exception as e:
+        logging.error(f"Currency conversion error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Currency conversion failed: {str(e)}")
+
+@api_router.get("/destination-currency", response_model=Dict[str, Any])
+async def get_destination_currency(destination: str):
+    """Get local currency for a destination"""
+    try:
+        # Destination to currency mapping
+        destination_currencies = {
+            "japan": "JPY", "tokyo": "JPY", "kyoto": "JPY", "osaka": "JPY",
+            "thailand": "THB", "bangkok": "THB", "phuket": "THB", "chiang mai": "THB",
+            "india": "INR", "mumbai": "INR", "delhi": "INR", "goa": "INR", "kerala": "INR",
+            "france": "EUR", "paris": "EUR", "nice": "EUR", "lyon": "EUR",
+            "germany": "EUR", "berlin": "EUR", "munich": "EUR", "hamburg": "EUR",
+            "italy": "EUR", "rome": "EUR", "florence": "EUR", "venice": "EUR",
+            "spain": "EUR", "madrid": "EUR", "barcelona": "EUR", "seville": "EUR",
+            "uk": "GBP", "london": "GBP", "edinburgh": "GBP", "manchester": "GBP",
+            "australia": "AUD", "sydney": "AUD", "melbourne": "AUD", "brisbane": "AUD",
+            "canada": "CAD", "toronto": "CAD", "vancouver": "CAD", "montreal": "CAD",
+            "mexico": "MXN", "mexico city": "MXN", "cancun": "MXN", "tulum": "MXN",
+            "brazil": "BRL", "rio": "BRL", "sao paulo": "BRL", "salvador": "BRL",
+            "south korea": "KRW", "seoul": "KRW", "busan": "KRW",
+            "singapore": "SGD",
+            "hong kong": "HKD",
+            "norway": "NOK", "oslo": "NOK", "bergen": "NOK",
+            "sweden": "SEK", "stockholm": "SEK", "gothenburg": "SEK",
+            "denmark": "DKK", "copenhagen": "DKK",
+            "switzerland": "CHF", "zurich": "CHF", "geneva": "CHF",
+            "china": "CNY", "beijing": "CNY", "shanghai": "CNY",
+            "uae": "AED", "dubai": "AED", "abu dhabi": "AED",
+            "saudi arabia": "SAR", "riyadh": "SAR", "jeddah": "SAR",
+            "south africa": "ZAR", "cape town": "ZAR", "johannesburg": "ZAR",
+            "egypt": "EGP", "cairo": "EGP", "alexandria": "EGP",
+            "turkey": "TRY", "istanbul": "TRY", "ankara": "TRY",
+        }
+        
+        destination_lower = destination.lower()
+        currency = "USD"  # Default
+        
+        for place, curr in destination_currencies.items():
+            if place in destination_lower:
+                currency = curr
+                break
+        
+        return {
+            "success": True,
+            "destination": destination,
+            "currency": currency
+        }
+        
+    except Exception as e:
+        logging.error(f"Destination currency error: {str(e)}")
+        return {
+            "success": True,
+            "destination": destination,
+            "currency": "USD"
+        }
+
 @api_router.get("/travel-insights", response_model=Dict[str, Any])
 async def get_travel_insights():
     """Get aggregated travel insights and statistics"""
