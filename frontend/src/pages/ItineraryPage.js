@@ -14,6 +14,9 @@ const API = `${BACKEND_URL}/api`;
 const ItineraryPage = () => {
   const navigate = useNavigate();
   const [itineraryData, setItineraryData] = useState(null);
+  const [localCurrency, setLocalCurrency] = useState("USD");
+  const [convertedCosts, setConvertedCosts] = useState(null);
+  const [currencyLoading, setCurrencyLoading] = useState(false);
 
   useEffect(() => {
     const storedItinerary = localStorage.getItem('generatedItinerary');
