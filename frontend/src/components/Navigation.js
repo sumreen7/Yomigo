@@ -27,7 +27,7 @@ const Navigation = () => {
           <Link to="/" className="flex items-center space-x-2">
             <Sparkles className="w-8 h-8 text-amber-500" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              WanderWise AI
+              Yomigo
             </span>
           </Link>
 
