@@ -111,6 +111,27 @@ const SafetyPage = () => {
           </p>
         </div>
 
+        {/* Feature Highlights */}
+        <div className="max-w-6xl mx-auto mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="text-center p-6">
+              <MapPin className="w-16 h-16 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-xl font-semibold mb-2">Destination Safety</h3>
+              <p className="text-gray-600">Comprehensive safety reports for any destination worldwide</p>
+            </Card>
+            <Card className="text-center p-6">
+              <Star className="w-16 h-16 mx-auto mb-4 text-indigo-600" />
+              <h3 className="text-xl font-semibold mb-2">Review Analysis</h3>
+              <p className="text-gray-600">AI-powered analysis of travel reviews for safety insights</p>
+            </Card>
+            <Card className="text-center p-6">
+              <Shield className="w-16 h-16 mx-auto mb-4 text-green-600" />
+              <h3 className="text-xl font-semibold mb-2">Smart Insights</h3>
+              <p className="text-gray-600">Get cleanliness scores, sentiment analysis, and recommendations</p>
+            </Card>
+          </div>
+        </div>
+
         {/* Tool Selection */}
         <div className="max-w-4xl mx-auto mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,10 +143,13 @@ const SafetyPage = () => {
               }`}
               onClick={() => setSelectedTool('destination')}
             >
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-8 text-center">
                 <MapPin className="w-12 h-12 mx-auto mb-4 text-blue-600" />
                 <h3 className="text-xl font-semibold text-blue-800 mb-2">Destination Safety Check</h3>
-                <p className="text-blue-600">Get comprehensive safety assessment for any destination worldwide</p>
+                <p className="text-blue-600 mb-4">Get comprehensive safety assessment for any destination worldwide</p>
+                <Badge className="bg-blue-600 text-white">
+                  {selectedTool === 'destination' ? 'Selected' : 'Click to Select'}
+                </Badge>
               </CardContent>
             </Card>
 
@@ -137,10 +161,13 @@ const SafetyPage = () => {
               }`}
               onClick={() => setSelectedTool('review')}
             >
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-8 text-center">
                 <Star className="w-12 h-12 mx-auto mb-4 text-indigo-600" />
-                <h3 className="text-xl font-semibold text-indigo-800 mb-2">Review Analyzer</h3>
-                <p className="text-indigo-600">Analyze safety & cleanliness insights from travel reviews</p>
+                <h3 className="text-xl font-semibold text-indigo-800 mb-2">Travel Review Analyzer</h3>
+                <p className="text-indigo-600 mb-4">Analyze safety & cleanliness insights from travel reviews, hotels, restaurants</p>
+                <Badge className="bg-indigo-600 text-white">
+                  {selectedTool === 'review' ? 'Selected' : 'Click to Select'}
+                </Badge>
               </CardContent>
             </Card>
           </div>
