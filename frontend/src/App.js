@@ -429,24 +429,30 @@ const SmartItineraryBuilder = () => {
 
     setLoading(true);
     try {
-      const itineraryData = {
-        destination: selectedDestination.name,
-        preferences: {
-          destination_type: preferences.destination_type,
-          budget_range: preferences.budget_range,
-          travel_style: preferences.travel_style,
-          duration: parseInt(preferences.duration) || 7,
-          activities: selectedActivities.map(a => a.name),
-          vibe: preferences.vibe || "relaxing and enjoyable"
-        },
-        selected_activities: selectedActivities.map(a => a.name),
-        travel_dates: preferences.travel_dates
+      console.log("Creating final itinerary for:", selectedDestination.name);
+      console.log("Selected activities:", selectedActivities);
+      console.log("Preferences:", preferences);
+      
+      // Calculate duration from dates
+      const duration = calculateDuration();
+      
+      const requestData = {
+        destination_type: preferences.destination_type,
+        budget_range: preferences.budget_range,
+        travel_style: preferences.travel_style,
+        duration: duration,
+        activities: selectedActivities.map(a => a.name),
+        vibe: preferences.vibe || "relaxing and enjoyable"
       };
       
-      const response = await axios.post(`${API}/smart-itinerary`, itineraryData, {
+      console.log("Sending request data:", requestData);
+      
+      const response = await axios.post(`${API}/smart-itinerary`, requestData, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 30000
       });
+      
+      console.log("Itinerary response:", response.data);
       
       if (response.data && response.data.itinerary) {
         setItinerary(response.data.itinerary);
@@ -457,7 +463,18 @@ const SmartItineraryBuilder = () => {
       }
     } catch (error) {
       console.error("Final itinerary creation error:", error);
-      toast.error("Failed to create itinerary. Please try again.");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = "Failed to create itinerary. Please try again.";
+      if (error.response?.status === 500) {
+        errorMessage = "Server error. Our AI is having trouble - please try again in a moment.";
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = "Request timed out. Please try again.";
+      } else if (error.response?.data?.detail) {
+        errorMessage = `Error: ${error.response.data.detail}`;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
