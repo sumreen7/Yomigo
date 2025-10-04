@@ -350,11 +350,26 @@ const SmartItineraryBuilder = () => {
 
   // Check for generated itinerary from vibe matcher
   useEffect(() => {
-    const storedItinerary = localStorage.getItem('generatedItinerary');
-    if (storedItinerary) {
-      const parsed = JSON.parse(storedItinerary);
+    const vibeItinerary = localStorage.getItem('vibeGeneratedItinerary');
+    if (vibeItinerary) {
+      const parsed = JSON.parse(vibeItinerary);
+      console.log("Loading vibe-generated itinerary:", parsed);
+      
+      // Set the itinerary and mark as step 4 (final results)
       setItinerary(parsed.itinerary);
-      localStorage.removeItem('generatedItinerary'); // Clear after loading
+      setSelectedDestination({ name: parsed.destination, ...parsed.destinationDetails });
+      setStep(4);
+      
+      // Optionally populate preferences for display
+      if (parsed.preferences) {
+        setPreferences(prev => ({
+          ...prev,
+          ...parsed.preferences,
+          travel_dates: prev.travel_dates // Keep existing travel dates
+        }));
+      }
+      
+      localStorage.removeItem('vibeGeneratedItinerary'); // Clear after loading
     }
   }, []);
 
