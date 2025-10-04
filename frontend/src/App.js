@@ -364,6 +364,17 @@ const SmartItineraryBuilder = () => {
       toast.error("Please fill in the required fields!");
       return;
     }
+    
+    if (!preferences.travel_dates.start_date || !preferences.travel_dates.end_date) {
+      toast.error("Please select your travel dates!");
+      return;
+    }
+
+    const duration = calculateDuration();
+    if (duration > 30) {
+      toast.error("Maximum trip duration is 30 days. Please adjust your dates.");
+      return;
+    }
 
     setLoading(true);
     try {
