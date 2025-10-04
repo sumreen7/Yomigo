@@ -54,6 +54,14 @@ const DestinationSelectionPage = () => {
     return 7;
   };
 
+  const toggleActivity = (activity) => {
+    setSelectedActivities(prev => 
+      prev.includes(activity)
+        ? prev.filter(a => a !== activity)
+        : [...prev, activity]
+    );
+  };
+
   const generateItinerary = async () => {
     if (!travelDates.start_date || !travelDates.end_date) {
       toast.error("Please select your travel dates!");
