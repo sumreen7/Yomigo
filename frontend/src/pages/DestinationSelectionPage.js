@@ -23,6 +23,13 @@ const DestinationSelectionPage = () => {
   });
   const [travelStyle, setTravelStyle] = useState("relaxed");
   const [travelers, setTravelers] = useState("2");
+  const [selectedActivities, setSelectedActivities] = useState([]);
+
+  const activityOptions = [
+    "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
+    "Shopping", "Beaches", "Hiking", "Photography", "Local Culture",
+    "Art Galleries", "Historical Sites", "Nature Parks", "Boat Tours", "Walking Tours"
+  ];
 
   useEffect(() => {
     // Load vibe match data
