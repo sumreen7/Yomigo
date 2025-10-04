@@ -136,33 +136,46 @@ const VibeDestinationMatcher = () => {
       console.log("Preferences:", preferences);
 
       const response = await axios.post(`${API}/smart-itinerary`, preferences, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 60000
       });
       
       console.log("Itinerary response:", response.data);
       
-      // Store the result in local storage so it can be accessed from other components
-      localStorage.setItem('generatedItinerary', JSON.stringify({
-        destination: destination.name,
-        itinerary: response.data.itinerary,
-        preferences: preferences
-      }));
-      
-      // Show success message
-      toast.success(`🎉 Perfect itinerary created for ${destination.name}! Switching to Smart Itinerary tab...`);
-      
-      // Add a small delay then switch to itinerary tab
-      setTimeout(() => {
-        // Trigger tab change - we need to pass this function from parent
+      if (response.data && response.data.itinerary) {
+        // Store the complete result for Smart Itinerary tab to display
+        localStorage.setItem('vibeGeneratedItinerary', JSON.stringify({
+          fromVibeMatch: true,
+          destination: destination.name,
+          destinationDetails: destination,
+          itinerary: response.data.itinerary,
+          preferences: preferences,
+          vibeQuery: vibeQuery
+        }));
+        
+        // Show success message and switch tabs
+        toast.success(`🎉 Perfect itinerary created for ${destination.name}! Opening your personalized itinerary...`);
+        
+        // Switch to itinerary tab immediately
         if (window.switchToItineraryTab) {
           window.switchToItineraryTab();
         }
-      }, 1500);
+      } else {
+        throw new Error("Invalid response format");
+      }
       
     } catch (error) {
       console.error("Itinerary generation error:", error);
       console.error("Error details:", error.response?.data);
-      toast.error(`❌ Failed to create itinerary for ${destination.name}. Please try again.`);
+      
+      let errorMessage = `Failed to create itinerary for ${destination.name}.`;
+      if (error.response?.status === 500) {
+        errorMessage = "Server error. Our AI is having trouble - please try again in a moment.";
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = "Request timed out. Please try again.";
+      }
+      
+      toast.error(`❌ ${errorMessage}`);
     } finally {
       setGeneratingItinerary(prev => ({ ...prev, [index]: false }));
     }
