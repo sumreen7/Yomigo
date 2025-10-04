@@ -96,6 +96,24 @@ class VibeDestination(BaseModel):
     reasoning: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: str
+    password_hash: str
+    name: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+class SavedItinerary(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    destination: Dict[str, Any]
+    itinerary_data: Dict[str, Any]
+    travel_dates: Dict[str, Any]
+    preferences: Dict[str, Any]
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 # AI Helper Functions
 async def analyze_travel_vibe(vibe_description: str, preferences: dict) -> Dict[str, Any]:
     """Analyze travel vibe and match with destinations"""
