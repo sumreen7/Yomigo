@@ -44,7 +44,7 @@ const HomePage = () => {
         </div>
         
         <h1 className="text-7xl font-bold mb-8 bg-gradient-to-r from-white via-amber-100 to-amber-200 bg-clip-text text-transparent">
-          WanderWise AI
+          Yomigo
         </h1>
         
         <p className="text-3xl mb-12 text-slate-200 font-light leading-relaxed">
