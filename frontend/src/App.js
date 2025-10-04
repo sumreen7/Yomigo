@@ -619,26 +619,208 @@ const SmartItineraryBuilder = () => {
             </div>
           </div>
 
-          <div className="md:col-span-3">
-            <Button 
-              onClick={createItinerary} 
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 text-lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Your Perfect Itinerary...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Create My Itinerary
-                </>
-              )}
-            </Button>
-          </div>
+          {step === 1 && (
+            <div className="md:col-span-3">
+              <Button 
+                onClick={getDestinationSuggestions} 
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 text-lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Finding Perfect Destinations...
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="w-5 h-5 mr-2" />
+                    Find Destinations
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
+
+        {/* Step 2: Destination Selection */}
+        {step === 2 && destinationSuggestions.length > 0 && (
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-emerald-800">Choose Your Destination</h3>
+              <Button variant="outline" onClick={() => setStep(1)}>
+                ← Back to Preferences
+              </Button>
+            </div>
+            
+            <div className="grid gap-4">
+              {destinationSuggestions.map((destination, index) => (
+                <Card key={index} className="border-l-4 border-l-emerald-500 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => selectDestination(destination)}>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h4 className="text-xl font-bold text-emerald-800 flex items-center gap-2">
+                          <MapPin className="w-5 h-5" />
+                          {destination.name}
+                        </h4>
+                        {destination.avg_temp && (
+                          <Badge variant="secondary" className="mt-1">
+                            {destination.avg_temp} • {destination.best_months?.join(', ')}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-gray-700 mb-3">{destination.description}</p>
+                    
+                    {destination.highlights && (
+                      <div className="mb-3">
+                        <p className="font-semibold text-gray-800 mb-2">Highlights:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {destination.highlights.map((highlight, i) => (
+                            <Badge key={i} variant="outline" className="text-emerald-700">
+                              {highlight}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {destination.why_now && (
+                      <div className="bg-emerald-50 p-3 rounded">
+                        <p className="text-emerald-800 font-medium">Perfect for {preferences.travel_dates.travel_month}:</p>
+                        <p className="text-emerald-700">{destination.why_now}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Activity Selection */}
+        {step === 3 && activitySuggestions && (
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-emerald-800">Choose Activities for {selectedDestination?.name}</h3>
+              <Button variant="outline" onClick={() => setStep(2)}>
+                ← Back to Destinations
+              </Button>
+            </div>
+
+            {activitySuggestions.seasonal_activities && activitySuggestions.seasonal_activities.length > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                  🌟 Special for {preferences.travel_dates.travel_month}
+                </h4>
+                <div className="grid gap-3">
+                  {activitySuggestions.seasonal_activities.map((activity, index) => (
+                    <Card 
+                      key={`seasonal-${index}`} 
+                      className={`cursor-pointer transition-all ${
+                        selectedActivities.find(a => a.name === activity.name) 
+                          ? 'border-emerald-500 bg-emerald-50' 
+                          : 'border-gray-200 hover:border-emerald-300'
+                      }`}
+                      onClick={() => toggleActivity(activity)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h5 className="font-bold text-emerald-800">{activity.name}</h5>
+                            <p className="text-gray-700 mb-2">{activity.description}</p>
+                            <div className="flex gap-4 text-sm text-gray-600">
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="w-4 h-4" />
+                                {activity.cost}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                {activity.duration}
+                              </span>
+                            </div>
+                            {activity.why_this_month && (
+                              <p className="text-emerald-700 text-sm mt-2 font-medium">
+                                ✨ {activity.why_this_month}
+                              </p>
+                            )}
+                          </div>
+                          {selectedActivities.find(a => a.name === activity.name) && (
+                            <div className="ml-4 text-emerald-600">
+                              <Star className="w-6 h-6 fill-current" />
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activitySuggestions.year_round_activities && activitySuggestions.year_round_activities.length > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">🏛️ Year-Round Activities</h4>
+                <div className="grid gap-3">
+                  {activitySuggestions.year_round_activities.map((activity, index) => (
+                    <Card 
+                      key={`year-round-${index}`}
+                      className={`cursor-pointer transition-all ${
+                        selectedActivities.find(a => a.name === activity.name)
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-emerald-300'
+                      }`}
+                      onClick={() => toggleActivity(activity)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h5 className="font-bold text-gray-800">{activity.name}</h5>
+                            <p className="text-gray-700 mb-2">{activity.description}</p>
+                            <div className="flex gap-4 text-sm text-gray-600">
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="w-4 h-4" />
+                                {activity.cost}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                {activity.duration}
+                              </span>
+                            </div>
+                          </div>
+                          {selectedActivities.find(a => a.name === activity.name) && (
+                            <div className="ml-4 text-emerald-600">
+                              <Star className="w-6 h-6 fill-current" />
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-4">
+              <Button 
+                onClick={createFinalItinerary}
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Creating Itinerary...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Create Itinerary ({selectedActivities.length} activities selected)
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {itinerary && (
           <div className="mt-8 space-y-6">
