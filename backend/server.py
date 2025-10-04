@@ -476,7 +476,7 @@ async def get_destination_suggestions(
                     "success": True,
                     "destinations": destinations
                 }
-        except:
+        except Exception:
             pass
         
         # Fallback destinations
