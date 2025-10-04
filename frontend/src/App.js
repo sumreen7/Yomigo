@@ -360,19 +360,32 @@ const SmartItineraryBuilder = () => {
   };
 
   const getDestinationSuggestions = async () => {
-    if (!preferences.destination_type || !preferences.budget_range || !preferences.travel_style) {
-      toast.error("Please fill in the required fields!");
+    console.log("Form submission - current preferences:", preferences);
+    
+    // Detailed validation with specific error messages
+    const errors = [];
+    if (!preferences.destination_type) errors.push("destination type");
+    if (!preferences.budget_range) errors.push("budget range");
+    if (!preferences.travel_style) errors.push("travel style");
+    
+    if (errors.length > 0) {
+      toast.error(`Please select: ${errors.join(', ')}`);
       return;
     }
     
     if (!preferences.travel_dates.start_date || !preferences.travel_dates.end_date) {
-      toast.error("Please select your travel dates!");
+      toast.error("Please select both start and end travel dates!");
       return;
     }
 
     const duration = calculateDuration();
     if (duration > 30) {
       toast.error("Maximum trip duration is 30 days. Please adjust your dates.");
+      return;
+    }
+
+    if (duration < 1) {
+      toast.error("End date must be after start date!");
       return;
     }
 
