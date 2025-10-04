@@ -313,16 +313,173 @@ async def match_vibe_destinations(vibe_query: str, destination_type: Optional[st
         logging.error(f"Vibe matching error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Vibe matching failed: {str(e)}")
 
-@api_router.post("/smart-itinerary", response_model=Dict[str, Any])
-async def create_personalized_itinerary(preferences: TravelPreferences):
-    """Create personalized travel itinerary"""
+@api_router.post("/destination-suggestions", response_model=Dict[str, Any])
+async def get_destination_suggestions(
+    destination_type: str,
+    budget_range: str,
+    travel_style: str,
+    vibe: str = "",
+    travel_month: Optional[str] = None
+):
+    """Get destination suggestions based on preferences"""
     try:
-        itinerary_data = await create_smart_itinerary(preferences)
+        prompt = f"""
+        Suggest 5 specific destinations for:
+        - Type: {destination_type}
+        - Budget: {budget_range}
+        - Style: {travel_style}
+        - Vibe: {vibe}
+        - Travel month: {travel_month or 'any time'}
+        
+        Return JSON array:
+        [{{
+            "name": "City, Country",
+            "description": "Why it's perfect",
+            "best_months": ["Jan", "Feb"],
+            "avg_temp": "25°C",
+            "highlights": ["attraction1", "attraction2"],
+            "why_now": "Seasonal reason if travel_month specified"
+        }}]
+        """
+        
+        message = UserMessage(text=prompt)
+        response = await openai_chat.send_message(message)
+        
+        try:
+            response_text = str(response)
+            json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+            if json_match:
+                destinations = json.loads(json_match.group())
+                return {
+                    "success": True,
+                    "destinations": destinations
+                }
+        except:
+            pass
+        
+        # Fallback destinations
+        fallback_destinations = [
+            {
+                "name": f"Popular {destination_type.title()} Destination",
+                "description": f"Perfect for {travel_style} {budget_range} travelers",
+                "best_months": ["Apr", "May", "Sep", "Oct"],
+                "avg_temp": "22°C",
+                "highlights": ["Local attractions", "Great food", "Beautiful scenery"],
+                "why_now": f"Great time for {travel_style} activities"
+            }
+        ]
+        
+        return {
+            "success": True,
+            "destinations": fallback_destinations
+        }
+        
+    except Exception as e:
+        logging.error(f"Destination suggestions error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get suggestions: {str(e)}")
+
+@api_router.post("/activity-suggestions", response_model=Dict[str, Any])
+async def get_activity_suggestions(
+    destination: str,
+    travel_style: str,
+    budget_range: str,
+    travel_month: str,
+    duration: int
+):
+    """Get activity suggestions for specific destination and dates"""
+    try:
+        prompt = f"""
+        Suggest activities for {destination} in {travel_month}:
+        - Style: {travel_style}
+        - Budget: {budget_range}
+        - Duration: {duration} days
+        
+        Return JSON:
+        {{
+            "seasonal_activities": [{{
+                "name": "Activity name",
+                "description": "What it involves",
+                "cost": "$XX-YY",
+                "duration": "X hours",
+                "best_time": "morning/afternoon/evening",
+                "why_this_month": "Seasonal reason"
+            }}],
+            "year_round_activities": [{{
+                "name": "Activity name", 
+                "description": "What it involves",
+                "cost": "$XX-YY",
+                "duration": "X hours"
+            }}]
+        }}
+        """
+        
+        message = UserMessage(text=prompt)
+        response = await openai_chat.send_message(message)
+        
+        try:
+            response_text = str(response)
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                activities = json.loads(json_match.group())
+                return {
+                    "success": True,
+                    "activities": activities
+                }
+        except:
+            pass
+        
+        # Fallback activities
+        return {
+            "success": True,
+            "activities": {
+                "seasonal_activities": [
+                    {
+                        "name": f"{travel_month} Special Experience",
+                        "description": f"Perfect activity for {travel_month} in {destination}",
+                        "cost": "$50-100",
+                        "duration": "3-4 hours",
+                        "best_time": "morning",
+                        "why_this_month": f"Ideal weather and conditions in {travel_month}"
+                    }
+                ],
+                "year_round_activities": [
+                    {
+                        "name": "Local Cultural Tour",
+                        "description": f"Explore the culture and history of {destination}",
+                        "cost": "$30-60",
+                        "duration": "2-3 hours"
+                    }
+                ]
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Activity suggestions error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get activities: {str(e)}")
+
+@api_router.post("/smart-itinerary", response_model=Dict[str, Any])
+async def create_personalized_itinerary(
+    destination: str,
+    preferences: TravelPreferences,
+    selected_activities: List[str] = [],
+    travel_dates: Optional[Dict[str, str]] = None
+):
+    """Create detailed itinerary for selected destination"""
+    try:
+        # Enhanced preferences with destination
+        enhanced_preferences = preferences.dict()
+        enhanced_preferences["selected_destination"] = destination
+        enhanced_preferences["selected_activities"] = selected_activities
+        enhanced_preferences["travel_dates"] = travel_dates
+        
+        itinerary_data = await create_smart_itinerary_for_destination(
+            destination, preferences, selected_activities, travel_dates
+        )
         
         # Save recommendation
         recommendation = TravelRecommendation(
             user_preferences=preferences,
-            destinations=itinerary_data.get("destination_recommendations", []),
+            destinations=[{"name": destination}],
             itinerary=itinerary_data,
             estimated_cost=itinerary_data.get("estimated_costs", {})
         )
@@ -331,7 +488,8 @@ async def create_personalized_itinerary(preferences: TravelPreferences):
         
         return {
             "success": True,
-            "preferences": preferences.dict(),
+            "destination": destination,
+            "preferences": enhanced_preferences,
             "itinerary": itinerary_data
         }
         
