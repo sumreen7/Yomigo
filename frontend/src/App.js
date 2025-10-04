@@ -568,8 +568,13 @@ const SmartItineraryBuilder = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Travel Style *</label>
-            <Select value={preferences.travel_style} onValueChange={(value) => 
-              setPreferences(prev => ({ ...prev, travel_style: value }))}>
+            <Select 
+              value={preferences.travel_style} 
+              onValueChange={(value) => {
+                console.log("Travel style selected:", value);
+                setPreferences(prev => ({ ...prev, travel_style: value }));
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select style" />
               </SelectTrigger>
