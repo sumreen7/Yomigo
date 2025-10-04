@@ -82,7 +82,7 @@ const DestinationSelectionPage = () => {
         budget_range: destinationData.budget || "mid-range",
         travel_style: travelStyle,
         duration: duration,
-        activities: ["sightseeing", "local culture", "food tours"],
+        activities: selectedActivities.length > 0 ? selectedActivities : ["sightseeing", "local culture", "food tours"],
         vibe: `${destinationData.vibeQuery} - specifically for ${destinationData.selectedDestination.name}, ${destinationData.selectedDestination.country}`
       };
 
