@@ -547,7 +547,7 @@ async def get_activity_suggestions(
                     "success": True,
                     "activities": activities
                 }
-        except:
+        except Exception:
             pass
         
         # Fallback activities
