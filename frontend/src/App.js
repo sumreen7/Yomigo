@@ -939,31 +939,37 @@ const SmartItineraryBuilder = () => {
             </div>
 
             {/* Destination Info */}
-            {itinerary.destination_info && (
+            {(itinerary.destination_info || selectedDestination) && (
               <Card className="border-l-4 border-l-emerald-500">
                 <CardContent className="p-6">
-                  <h4 className="text-xl font-bold text-emerald-800 mb-2">{itinerary.destination_info.name}</h4>
-                  <p className="text-gray-700 mb-3">{itinerary.destination_info.description}</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    {itinerary.destination_info.best_time_to_visit && (
-                      <div>
-                        <span className="font-semibold text-gray-800">Best Time:</span>
-                        <p className="text-gray-600">{itinerary.destination_info.best_time_to_visit}</p>
-                      </div>
-                    )}
-                    {itinerary.destination_info.local_currency && (
-                      <div>
-                        <span className="font-semibold text-gray-800">Currency:</span>
-                        <p className="text-gray-600">{itinerary.destination_info.local_currency}</p>
-                      </div>
-                    )}
-                    {itinerary.destination_info.language && (
-                      <div>
-                        <span className="font-semibold text-gray-800">Language:</span>
-                        <p className="text-gray-600">{itinerary.destination_info.language}</p>
-                      </div>
-                    )}
-                  </div>
+                  <h4 className="text-xl font-bold text-emerald-800 mb-2">
+                    {itinerary.destination_info?.name || selectedDestination?.name || 'Your Destination'}
+                  </h4>
+                  <p className="text-gray-700 mb-3">
+                    {itinerary.destination_info?.description || selectedDestination?.description || 'Your personalized travel destination based on your preferences'}
+                  </p>
+                  {itinerary.destination_info && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      {itinerary.destination_info.best_time_to_visit && (
+                        <div>
+                          <span className="font-semibold text-gray-800">Best Time:</span>
+                          <p className="text-gray-600">{itinerary.destination_info.best_time_to_visit}</p>
+                        </div>
+                      )}
+                      {itinerary.destination_info.local_currency && (
+                        <div>
+                          <span className="font-semibold text-gray-800">Currency:</span>
+                          <p className="text-gray-600">{itinerary.destination_info.local_currency}</p>
+                        </div>
+                      )}
+                      {itinerary.destination_info.language && (
+                        <div>
+                          <span className="font-semibold text-gray-800">Language:</span>
+                          <p className="text-gray-600">{itinerary.destination_info.language}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
