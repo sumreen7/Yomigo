@@ -19,9 +19,6 @@ const SafetyPage = () => {
   // Destination Safety Check
   const [destinationQuery, setDestinationQuery] = useState("");
 
-  // Review Analysis
-  const [reviewText, setReviewText] = useState("");
-
   const checkDestinationSafety = async () => {
     if (!destinationQuery.trim()) {
       toast.error("Please enter a destination!");
@@ -30,21 +27,26 @@ const SafetyPage = () => {
 
     setLoading(true);
     try {
-      const safetyPrompt = `Please provide a comprehensive safety assessment for travelers visiting ${destinationQuery}. Include information about general safety, crime rates, areas to avoid, transportation safety, health considerations, and any current travel advisories.`;
-      
+      // Use the new destination reviews endpoint that fetches reviews automatically
       const params = new URLSearchParams();
-      params.append('review_text', safetyPrompt);
+      params.append('destination', destinationQuery);
+      params.append('review_type', 'all');
       
-      const response = await axios.post(`${API}/analyze-review?${params.toString()}`);
-      setResults({
-        type: 'destination',
-        destination: destinationQuery,
-        analysis: response.data.analysis
-      });
-      toast.success(`Safety assessment completed for ${destinationQuery}!`);
+      const response = await axios.get(`${API}/destination-reviews?${params.toString()}`);
+      
+      if (response.data.success) {
+        setResults({
+          type: 'destination',
+          destination: destinationQuery,
+          reviewData: response.data
+        });
+        toast.success(`Found ${response.data.review_count} reviews for ${destinationQuery}!`);
+      } else {
+        toast.error("No reviews found for this destination");
+      }
     } catch (error) {
       console.error("Safety check error:", error);
-      toast.error("Failed to check destination safety. Please try again.");
+      toast.error("Failed to fetch destination reviews. Please try again.");
     } finally {
       setLoading(false);
     }
