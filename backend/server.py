@@ -1058,10 +1058,47 @@ async def get_duration_recommendation(
             "error": str(e)
         }
 
+def is_valid_destination(destination: str) -> bool:
+    """Check if destination appears to be a valid place name"""
+    destination_lower = destination.lower().strip()
+    
+    # Check for obviously invalid destinations
+    invalid_patterns = [
+        r'^[xyz]+$',  # Just xyz, x, y, z combinations
+        r'^\d+$',     # Just numbers
+        r'^[!@#$%^&*()]+$',  # Just special characters
+        r'^test$',    # test
+        r'^example$', # example
+        r'^null$',    # null
+        r'^undefined$', # undefined
+        r'^none$',    # none
+    ]
+    
+    for pattern in invalid_patterns:
+        if re.match(pattern, destination_lower):
+            return False
+    
+    # Check minimum length (real place names are usually at least 2 characters)
+    if len(destination_lower) < 2:
+        return False
+    
+    # Check for valid destination patterns (contains letters)
+    if not re.search(r'[a-zA-Z]', destination):
+        return False
+    
+    return True
+
 @api_router.get("/destination-reviews", response_model=Dict[str, Any])
 async def get_destination_reviews(destination: str, review_type: str = "all"):
     """Get aggregated reviews and analysis for a destination"""
     try:
+        # Validate destination first
+        if not is_valid_destination(destination):
+            raise HTTPException(
+                status_code=400, 
+                detail=f"'{destination}' does not appear to be a valid destination. Please enter a real city, country, or place name."
+            )
+        
         # Simulated review data - in production, integrate with TripAdvisor/Google Places API
         sample_reviews = {
             "tokyo": [
