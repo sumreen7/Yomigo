@@ -150,7 +150,7 @@ const ItineraryPage = () => {
     const { destination, itinerary, travelDates, travelers } = itineraryData;
     
     // Create text content for download
-    let content = `WANDERWISE AI ITINERARY\n`;
+    let content = `YOMIGO AI ITINERARY\n`;
     content += `======================\n\n`;
     content += `Destination: ${destination.name}\n`;
     content += `Dates: ${formatDate(travelDates?.start_date)} - ${formatDate(travelDates?.end_date)}\n`;
