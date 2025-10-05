@@ -520,7 +520,16 @@ async def login_user(email: str, password: str):
         
         return {
             "success": True,
-            "user": {"id": user["id"], "email": user["email"], "name": user["name"]},
+            "user": {
+                "id": user["id"], 
+                "email": user["email"], 
+                "name": user["name"],
+                "preferences": user.get("preferences", {
+                    "preferred_currency": "USD",
+                    "travel_style": "relaxed", 
+                    "budget_preference": "mid-range"
+                })
+            },
             "session_token": session_token
         }
         
