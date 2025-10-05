@@ -66,6 +66,32 @@ const DestinationSelectionPage = () => {
     );
   };
 
+  const getSeasonalActivities = async (month) => {
+    if (!destinationData?.selectedDestination?.name || !month) return;
+    
+    setLoadingActivities(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('destination', destinationData.selectedDestination.name);
+      params.append('travel_style', travelStyle);
+      params.append('budget_range', destinationData.budget || 'mid-range');
+      params.append('travel_month', month);
+      params.append('duration', calculateDuration());
+      
+      const response = await axios.post(`${API}/activity-suggestions?${params.toString()}`);
+      
+      if (response.data.success) {
+        setSeasonalActivities(response.data.activities);
+        toast.success(`Found ${month} activities for ${destinationData.selectedDestination.name}!`);
+      }
+    } catch (error) {
+      console.error("Failed to get seasonal activities:", error);
+      toast.error("Failed to load seasonal activities");
+    } finally {
+      setLoadingActivities(false);
+    }
+  };
+
   const getDurationRecommendation = async () => {
     if (!destinationData?.selectedDestination?.name) return;
     
