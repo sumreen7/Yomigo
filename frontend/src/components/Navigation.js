@@ -47,7 +47,7 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -56,6 +56,7 @@ const Navigation = () => {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={item.onClick}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive 
                       ? 'bg-gray-100 text-gray-900 font-semibold' 
@@ -67,6 +68,38 @@ const Navigation = () => {
                 </Link>
               );
             })}
+            
+            {/* Auth Controls */}
+            <div className="border-l border-gray-300 pl-4 ml-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">{user?.name}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-1"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Login</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
