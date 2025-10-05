@@ -347,34 +347,54 @@ const ItineraryPage = () => {
           </Button>
         </div>
 
-        {/* Currency Converter */}
-        {localCurrency !== "USD" && (
-          <div className="max-w-md mx-auto mb-8">
-            <Card className="shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-800">Local Currency</h4>
-                    <p className="text-sm text-gray-600">Convert costs to {localCurrency}</p>
-                  </div>
-                  <Button 
-                    onClick={() => convertCurrency(localCurrency)}
-                    disabled={currencyLoading}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    {currencyLoading ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <DollarSign className="w-4 h-4" />
-                    )}
-                    Convert to {localCurrency}
-                  </Button>
+        {/* Currency Selection */}
+        <div className="max-w-md mx-auto mb-8">
+          <Card className="shadow-lg">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-gray-800">Display Currency</h4>
+                  <p className="text-sm text-gray-600">
+                    {isAuthenticated ? "Your preferred currency" : "Choose display currency"}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+                
+                <div className="flex items-center gap-4">
+                  <Select value={displayCurrency} onValueChange={setDisplayCurrency}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD - US Dollar</SelectItem>
+                      <SelectItem value="EUR">EUR - Euro</SelectItem>
+                      <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                      <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                      <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                      <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                      <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                      <SelectItem value="CNY">CNY - Chinese Yuan</SelectItem>
+                      <SelectItem value="INR">INR - Indian Rupee</SelectItem>
+                      <SelectItem value="THB">THB - Thai Baht</SelectItem>
+                      {localCurrency !== "USD" && localCurrency !== displayCurrency && (
+                        <SelectItem value={localCurrency}>{localCurrency} - Local Currency</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  
+                  {currencyLoading && (
+                    <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />
+                  )}
+                </div>
+
+                {localCurrency !== "USD" && localCurrency !== displayCurrency && (
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    💡 Tip: Local currency for this destination is {localCurrency}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="max-w-6xl mx-auto space-y-8">
           
