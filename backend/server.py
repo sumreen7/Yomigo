@@ -540,6 +540,84 @@ async def verify_session(session_token: str):
         logging.error(f"Session verification error: {str(e)}")
         raise HTTPException(status_code=401, detail="Invalid session")
 
+# User Preferences Endpoints
+@api_router.get("/user/preferences", response_model=Dict[str, Any])
+async def get_user_preferences(session_token: str):
+    """Get user preferences"""
+    try:
+        # Verify session
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        user = await db.users.find_one({"id": session["user_id"]})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        # Return preferences with defaults if not set
+        preferences = user.get("preferences", {
+            "preferred_currency": "USD",
+            "travel_style": "relaxed", 
+            "budget_preference": "mid-range"
+        })
+        
+        return {
+            "success": True,
+            "preferences": preferences
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Get preferences error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get preferences: {str(e)}")
+
+@api_router.post("/user/preferences", response_model=Dict[str, Any])
+async def update_user_preferences(
+    session_token: str,
+    preferred_currency: Optional[str] = None,
+    travel_style: Optional[str] = None,
+    budget_preference: Optional[str] = None
+):
+    """Update user preferences"""
+    try:
+        # Verify session
+        session = await db.sessions.find_one({"token": session_token})
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Build update data
+        update_data = {}
+        if preferred_currency:
+            update_data["preferences.preferred_currency"] = preferred_currency
+        if travel_style:
+            update_data["preferences.travel_style"] = travel_style
+        if budget_preference:
+            update_data["preferences.budget_preference"] = budget_preference
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No preferences provided")
+        
+        # Update user preferences
+        result = await db.users.update_one(
+            {"id": session["user_id"]},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="User not found or no changes made")
+        
+        return {
+            "success": True,
+            "message": "Preferences updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Update preferences error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update preferences: {str(e)}")
+
 # Saved Itinerary Endpoints
 @api_router.post("/itineraries/save", response_model=Dict[str, Any])
 async def save_itinerary(
