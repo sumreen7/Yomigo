@@ -305,9 +305,10 @@ const PlanDirectPage = () => {
               </div>
 
               {/* Budget and Style */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <DollarSign className="w-4 h-4 inline mr-1" />
                     Budget Range *
                   </label>
                   <Select 
@@ -323,6 +324,7 @@ const PlanDirectPage = () => {
                       <SelectItem value="luxury">💎 Luxury ($250+/day)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-gray-500 mt-1">Per person, including accommodation, food, and activities</p>
                 </div>
 
                 <div>
@@ -342,26 +344,56 @@ const PlanDirectPage = () => {
                       <SelectItem value="cultural">🏛️ Cultural & Educational</SelectItem>
                       <SelectItem value="romantic">💕 Romantic & Intimate</SelectItem>
                       <SelectItem value="party">🎉 Social & Nightlife</SelectItem>
+                      <SelectItem value="business">💼 Business & Work</SelectItem>
+                      <SelectItem value="family">👨‍👩‍👧‍👦 Family Friendly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Preferences */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Accommodation Preference
+                  </label>
+                  <Select 
+                    value={formData.accommodation_preference} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, accommodation_preference: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select accommodation type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hotel">🏨 Hotels</SelectItem>
+                      <SelectItem value="resort">🏝️ Resorts</SelectItem>
+                      <SelectItem value="boutique">💎 Boutique Hotels</SelectItem>
+                      <SelectItem value="airbnb">🏠 Airbnb/Apartments</SelectItem>
+                      <SelectItem value="hostel">🎒 Hostels</SelectItem>
+                      <SelectItem value="luxury">✨ Luxury Properties</SelectItem>
+                      <SelectItem value="mixed">🔄 Mix of Options</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Travelers
+                    Transportation Preference
                   </label>
                   <Select 
-                    value={formData.travelers} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, travelers: value }))}
+                    value={formData.transport_preference} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, transport_preference: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select transport preference" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Solo Traveler</SelectItem>
-                      <SelectItem value="2">Couple (2 people)</SelectItem>
-                      <SelectItem value="3-4">Small Group (3-4 people)</SelectItem>
-                      <SelectItem value="5+">Large Group (5+ people)</SelectItem>
+                      <SelectItem value="public">🚇 Public Transport</SelectItem>
+                      <SelectItem value="walking">🚶‍♂️ Walking & Local Transport</SelectItem>
+                      <SelectItem value="taxi">🚗 Taxis & Rideshare</SelectItem>
+                      <SelectItem value="rental">🚙 Car Rental</SelectItem>
+                      <SelectItem value="tours">🚌 Guided Tours</SelectItem>
+                      <SelectItem value="mixed">🔄 Combination</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
