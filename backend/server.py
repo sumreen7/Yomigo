@@ -101,6 +101,11 @@ class User(BaseModel):
     email: str
     password_hash: str
     name: str
+    preferences: Dict[str, Any] = Field(default_factory=lambda: {
+        "preferred_currency": "USD",
+        "travel_style": "relaxed",
+        "budget_preference": "mid-range"
+    })
     created_at: datetime = Field(default_factory=datetime.utcnow)
     
 class SavedItinerary(BaseModel):
