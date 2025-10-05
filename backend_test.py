@@ -572,6 +572,189 @@ class WanderWiseAPITester:
         
         return success
 
+    def test_itinerary_save_with_json_strings(self):
+        """Test itinerary save endpoint with JSON string parameters"""
+        if not hasattr(self, 'test_session_token'):
+            print("   ⚠️  Skipping - No session token available")
+            return True
+        
+        # Test data as JSON strings (as expected by the fixed endpoint)
+        destination_json = json.dumps({
+            "name": "Bali, Indonesia",
+            "country": "Indonesia",
+            "description": "Tropical paradise with spiritual vibes"
+        })
+        
+        itinerary_data_json = json.dumps({
+            "daily_itinerary": {
+                "day_1": {
+                    "morning": {"activity": "Temple visit", "time": "9:00 AM", "cost": "$20"},
+                    "afternoon": {"activity": "Beach relaxation", "time": "2:00 PM", "cost": "$0"},
+                    "evening": {"activity": "Local dinner", "time": "7:00 PM", "cost": "$25"}
+                }
+            },
+            "estimated_costs": {
+                "accommodation": "$150/night",
+                "meals": "$60/day",
+                "activities": "$80/day"
+            }
+        })
+        
+        travel_dates_json = json.dumps({
+            "start_date": "2024-03-15",
+            "end_date": "2024-03-20",
+            "duration": 5
+        })
+        
+        preferences_json = json.dumps({
+            "budget_range": "mid-range",
+            "travel_style": "relaxed",
+            "preferred_currency": "USD"
+        })
+        
+        params = {
+            'session_token': self.test_session_token,
+            'title': 'My Amazing Bali Trip',
+            'destination': destination_json,
+            'itinerary_data': itinerary_data_json,
+            'travel_dates': travel_dates_json,
+            'preferences': preferences_json
+        }
+        
+        success, response = self.run_test(
+            "Itinerary Save with JSON Strings",
+            "POST",
+            "itineraries/save",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            print(f"   Success: {response.get('success', 'N/A')}")
+            print(f"   Itinerary ID: {response.get('itinerary_id', 'N/A')}")
+            print(f"   Message: {response.get('message', 'N/A')}")
+            
+            # Store itinerary ID for potential cleanup
+            self.test_itinerary_id = response.get('itinerary_id')
+        
+        return success
+
+    def test_seasonal_activity_suggestions(self):
+        """Test seasonal activity suggestions endpoint with proper structure"""
+        params = {
+            'destination': 'Tokyo, Japan',
+            'travel_style': 'cultural',
+            'budget_range': 'mid-range',
+            'travel_month': 'April',
+            'duration': 7
+        }
+        
+        success, response = self.run_test(
+            "Seasonal Activity Suggestions",
+            "POST",
+            "activity-suggestions",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            activities = response.get('activities', {})
+            seasonal = activities.get('seasonal_activities', [])
+            year_round = activities.get('year_round_activities', [])
+            
+            print(f"   Seasonal Activities: {len(seasonal)}")
+            print(f"   Year-round Activities: {len(year_round)}")
+            
+            # Verify structure of seasonal activities
+            if seasonal:
+                first_seasonal = seasonal[0]
+                required_fields = ['name', 'description', 'cost', 'duration', 'why_this_month']
+                missing_fields = []
+                
+                for field in required_fields:
+                    if field not in first_seasonal:
+                        missing_fields.append(field)
+                    else:
+                        print(f"   ✅ Seasonal activity has {field}: {first_seasonal[field]}")
+                
+                if missing_fields:
+                    print(f"   ❌ Missing seasonal activity fields: {missing_fields}")
+                    return False
+            
+            # Verify structure of year-round activities
+            if year_round:
+                first_year_round = year_round[0]
+                required_fields = ['name', 'description', 'cost', 'duration']
+                missing_fields = []
+                
+                for field in required_fields:
+                    if field not in first_year_round:
+                        missing_fields.append(field)
+                    else:
+                        print(f"   ✅ Year-round activity has {field}: {first_year_round[field]}")
+                
+                if missing_fields:
+                    print(f"   ❌ Missing year-round activity fields: {missing_fields}")
+                    return False
+            
+            print("   ✅ Activity suggestions have proper structure")
+        
+        return success
+
+    def test_destination_reviews_auto_fetch(self):
+        """Test auto-fetch destination reviews endpoint"""
+        params = {
+            'destination': 'Tokyo, Japan',
+            'review_type': 'all'
+        }
+        
+        success, response = self.run_test(
+            "Auto-fetch Destination Reviews",
+            "GET",
+            "destination-reviews",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            print(f"   Destination: {response.get('destination', 'N/A')}")
+            print(f"   Review Count: {response.get('review_count', 'N/A')}")
+            
+            # Check aggregated scores
+            aggregated_scores = response.get('aggregated_scores', {})
+            if aggregated_scores:
+                print(f"   Average Safety: {aggregated_scores.get('average_safety', 'N/A')}/10")
+                print(f"   Average Cleanliness: {aggregated_scores.get('average_cleanliness', 'N/A')}/10")
+                print(f"   Dominant Sentiment: {aggregated_scores.get('dominant_sentiment', 'N/A')}")
+                
+                # Verify required fields
+                required_fields = ['average_safety', 'average_cleanliness', 'sentiment_distribution', 'dominant_sentiment']
+                missing_fields = []
+                
+                for field in required_fields:
+                    if field not in aggregated_scores:
+                        missing_fields.append(field)
+                
+                if missing_fields:
+                    print(f"   ❌ Missing aggregated score fields: {missing_fields}")
+                    return False
+            
+            # Check detailed analyses
+            detailed_analyses = response.get('detailed_analyses', [])
+            print(f"   Detailed Analyses: {len(detailed_analyses)}")
+            
+            # Check summary
+            summary = response.get('summary', '')
+            print(f"   Has Summary: {bool(summary)}")
+            
+            if not summary:
+                print("   ❌ Missing summary field")
+                return False
+            
+            print("   ✅ Destination reviews have proper structure")
+        
+        return success
+
 def main():
     print("🚀 Starting WanderWise AI Travel Platform API Tests")
     print("=" * 60)
