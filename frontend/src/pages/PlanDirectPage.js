@@ -21,19 +21,24 @@ const PlanDirectPage = () => {
     destination_type: "",
     budget_range: "",
     travel_style: "",
-    travelers: "2",
+    travelers: "1", // Fixed default to solo traveler
     vibe: "",
     travel_dates: {
       start_date: "",
       end_date: "",
       travel_month: ""
     },
-    selected_activities: []
+    selected_activities: [],
+    special_requirements: "",
+    accommodation_preference: "",
+    transport_preference: ""
   });
   const [durationRecommendation, setDurationRecommendation] = useState(null);
   const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+  const [seasonalActivities, setSeasonalActivities] = useState(null);
+  const [loadingActivities, setLoadingActivities] = useState(false);
 
-  const activityOptions = [
+  const defaultActivityOptions = [
     "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
     "Shopping", "Beaches", "Hiking", "Photography", "Local Culture",
     "Art Galleries", "Historical Sites", "Nature Parks", "Boat Tours", "Walking Tours"
