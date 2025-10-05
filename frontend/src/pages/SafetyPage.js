@@ -173,12 +173,15 @@ const SafetyPage = () => {
         </Card>
 
         {/* Results Display */}
-        {results && (
+        {results && results.reviewData && (
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                {results.type === 'destination' ? `Safety Report: ${results.destination}` : 'Review Analysis Results'}
+                Safety & Review Report: {results.destination}
               </h2>
+              <p className="text-gray-600 mb-4">
+                Based on analysis of {results.reviewData.review_count} reviews • {results.reviewData.source}
+              </p>
             </div>
             
             {/* Score Cards */}
@@ -186,12 +189,17 @@ const SafetyPage = () => {
               <Card className="shadow-lg">
                 <CardContent className="p-6 text-center">
                   <h4 className="font-semibold text-gray-800 mb-4">Overall Sentiment</h4>
-                  <Badge className={`text-xl px-6 py-3 border-2 ${getSentimentColor(results.analysis.overall_sentiment)}`}>
-                    {results.analysis.overall_sentiment?.toUpperCase()}
+                  <Badge className={`text-xl px-6 py-3 border-2 ${getSentimentColor(results.reviewData.aggregated_scores.dominant_sentiment)}`}>
+                    {results.reviewData.aggregated_scores.dominant_sentiment?.toUpperCase()}
                   </Badge>
-                  <p className="text-sm text-gray-600 mt-3">
-                    Confidence: {Math.round(results.analysis.sentiment_confidence * 100)}%
-                  </p>
+                  <div className="mt-3 text-sm text-gray-600">
+                    {Object.entries(results.reviewData.aggregated_scores.sentiment_distribution || {}).map(([sentiment, count]) => (
+                      <div key={sentiment} className="flex justify-between">
+                        <span className="capitalize">{sentiment}:</span>
+                        <span>{count} reviews</span>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -199,15 +207,15 @@ const SafetyPage = () => {
                 <CardContent className="p-6 text-center">
                   <h4 className="font-semibold text-gray-800 mb-4">Safety Score</h4>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    {getScoreIcon(results.analysis.safety_score)}
-                    <div className={`text-4xl font-bold ${getScoreColor(results.analysis.safety_score)}`}>
-                      {results.analysis.safety_score}/10
+                    {getScoreIcon(results.reviewData.aggregated_scores.average_safety)}
+                    <div className={`text-4xl font-bold ${getScoreColor(results.reviewData.aggregated_scores.average_safety)}`}>
+                      {results.reviewData.aggregated_scores.average_safety}/10
                     </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div 
                       className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-1000" 
-                      style={{ width: `${results.analysis.safety_score * 10}%` }}
+                      style={{ width: `${results.reviewData.aggregated_scores.average_safety * 10}%` }}
                     ></div>
                   </div>
                 </CardContent>
@@ -217,7 +225,7 @@ const SafetyPage = () => {
                 <CardContent className="p-6 text-center">
                   <h4 className="font-semibold text-gray-800 mb-4">Cleanliness Score</h4>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    {getScoreIcon(results.analysis.cleanliness_score)}
+                    {getScoreIcon(results.reviewData.aggregated_scores.average_cleanliness)}
                     <div className={`text-4xl font-bold ${getScoreColor(results.analysis.cleanliness_score)}`}>
                       {results.analysis.cleanliness_score}/10
                     </div>
