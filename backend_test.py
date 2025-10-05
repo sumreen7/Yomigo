@@ -761,7 +761,7 @@ def main():
     
     tester = WanderWiseAPITester()
     
-    # Run all tests - prioritizing new features as requested
+    # Run all tests - prioritizing newly implemented features as requested
     tests = [
         tester.test_root_endpoint,
         # User Preferences System Tests (Primary Focus)
@@ -770,6 +770,10 @@ def main():
         tester.test_get_user_preferences,
         tester.test_update_user_preferences,
         tester.test_verify_preferences_persistence,
+        # NEW FEATURES TO TEST (Based on Review Request)
+        tester.test_itinerary_save_with_json_strings,  # Fixed Itinerary Save Issue
+        tester.test_seasonal_activity_suggestions,     # Seasonal Activity Selection Backend
+        tester.test_destination_reviews_auto_fetch,    # Auto-fetch Review System
         # Enhanced Destination Suggestions Tests (Primary Focus)
         tester.test_enhanced_vibe_match,
         tester.test_enhanced_destination_suggestions,
