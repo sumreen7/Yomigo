@@ -64,6 +64,74 @@ const PlanDirectPage = () => {
     }));
   };
 
+  // Fetch seasonal activities based on destination and travel month
+  const getSeasonalActivities = async (destination, month) => {
+    if (!destination || !month || !formData.travel_style) return;
+    
+    setLoadingActivities(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('destination', destination);
+      params.append('travel_style', formData.travel_style);
+      params.append('budget_range', formData.budget_range || 'mid-range');
+      params.append('travel_month', month);
+      params.append('duration', calculateDuration());
+      
+      const response = await axios.post(`${API}/activity-suggestions?${params.toString()}`);
+      
+      if (response.data.success) {
+        setSeasonalActivities(response.data.activities);
+        toast.success(`Found ${month} activities for ${destination}!`);
+      }
+    } catch (error) {
+      console.error("Failed to get seasonal activities:", error);
+      // Don't show error toast for seasonal activities as it's optional
+    } finally {
+      setLoadingActivities(false);
+    }
+  };
+
+  // Get duration recommendation for the destination
+  const getDurationRecommendation = async (destination) => {
+    if (!destination || destination.length < 3) return;
+    
+    setLoadingRecommendation(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('destination', destination);
+      params.append('travel_style', formData.travel_style || 'relaxed');
+      params.append('traveler_count', formData.travelers);
+      
+      const response = await axios.post(`${API}/duration-recommendation?${params.toString()}`);
+      
+      if (response.data.success) {
+        setDurationRecommendation(response.data.recommendation);
+      }
+    } catch (error) {
+      console.error("Failed to get duration recommendation:", error);
+    } finally {
+      setLoadingRecommendation(false);
+    }
+  };
+
+  // Effect to fetch seasonal activities when destination and travel month change
+  useEffect(() => {
+    if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
+      getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
+    }
+  }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
+
+  // Effect to get duration recommendation when destination changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.destination && formData.destination.length >= 3) {
+        getDurationRecommendation(formData.destination);
+      }
+    }, 1000); // Debounce by 1 second
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.destination, formData.travel_style, formData.travelers]);
+
   const generateItinerary = async () => {
     // Validation
     if (!formData.destination.trim()) {
