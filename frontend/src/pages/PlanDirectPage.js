@@ -453,17 +453,33 @@ const PlanDirectPage = () => {
                 </div>
               </div>
 
-              {/* Travel Vibe */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Travel Vibe (Optional)
-                </label>
-                <Textarea
-                  placeholder="Describe what you're looking for... e.g., relaxing and peaceful, adventurous and exciting, cultural immersion..."
-                  value={formData.vibe}
-                  onChange={(e) => setFormData(prev => ({ ...prev, vibe: e.target.value }))}
-                  className="min-h-20 text-base"
-                />
+              {/* Travel Vibe & Requirements */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Star className="w-4 h-4 inline mr-1" />
+                    Travel Vibe & Goals (Optional)
+                  </label>
+                  <Textarea
+                    placeholder="Describe what you're looking for... e.g., relaxing and peaceful, adventurous and exciting, cultural immersion, food-focused journey, photography opportunities..."
+                    value={formData.vibe}
+                    onChange={(e) => setFormData(prev => ({ ...prev, vibe: e.target.value }))}
+                    className="min-h-20 text-base"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Info className="w-4 h-4 inline mr-1" />
+                    Special Requirements (Optional)
+                  </label>
+                  <Textarea
+                    placeholder="Any special needs or preferences... e.g., vegetarian restaurants, accessibility requirements, family-friendly activities, budget constraints, must-see places..."
+                    value={formData.special_requirements}
+                    onChange={(e) => setFormData(prev => ({ ...prev, special_requirements: e.target.value }))}
+                    className="min-h-20 text-base"
+                  />
+                </div>
               </div>
 
               {/* Activity Selection */}
