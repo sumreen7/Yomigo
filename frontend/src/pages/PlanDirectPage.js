@@ -30,6 +30,8 @@ const PlanDirectPage = () => {
     },
     selected_activities: []
   });
+  const [durationRecommendation, setDurationRecommendation] = useState(null);
+  const [loadingRecommendation, setLoadingRecommendation] = useState(false);
 
   const activityOptions = [
     "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
