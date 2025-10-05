@@ -121,7 +121,7 @@ const PlanDirectPage = () => {
     try {
       const vibePrompt = `I want to visit ${destination}`;
       const preferences = {
-        destination_type: formData.destination_type || 'city',
+        destination_type: (formData.destination_type === "auto" || !formData.destination_type) ? 'city' : formData.destination_type,
         budget_range: formData.budget_range || 'mid-range',
         travel_style: formData.travel_style || 'relaxed'
       };
