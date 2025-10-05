@@ -154,7 +154,6 @@ const PlanDirectPage = () => {
   // Effect to fetch seasonal activities when destination and travel month change
   useEffect(() => {
     if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
-      console.log("Fetching activities for:", formData.destination, "in", formData.travel_dates.travel_month);
       getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
     }
   }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
