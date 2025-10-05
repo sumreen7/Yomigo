@@ -156,7 +156,7 @@ const PlanDirectPage = () => {
     if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
       getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
     }
-  }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style, formData.budget_range]);
+  }, [formData.destination, formData.travel_dates.travel_month, getSeasonalActivities]);
 
   // Effect to get duration recommendation and highlights when destination changes
   useEffect(() => {
@@ -168,7 +168,7 @@ const PlanDirectPage = () => {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.destination, formData.travel_style, formData.travelers, formData.destination_type, formData.budget_range]);
+  }, [formData.destination, getDurationRecommendation, getDestinationHighlights]);
 
   const generateItinerary = async () => {
     // Validation
