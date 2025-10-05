@@ -9,6 +9,7 @@ const Navigation = () => {
   const location = useLocation();
   const { user, logout, isAuthenticated, clearTripData } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
   
   // Don't show navigation on homepage
   if (location.pathname === '/') {
