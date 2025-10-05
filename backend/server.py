@@ -659,10 +659,10 @@ async def update_user_preferences(
 async def save_itinerary(
     session_token: str,
     title: str,
-    destination: Dict[str, Any],
-    itinerary_data: Dict[str, Any],
-    travel_dates: Dict[str, Any],
-    preferences: Dict[str, Any]
+    destination: str,
+    itinerary_data: str,
+    travel_dates: str,
+    preferences: str
 ):
     """Save itinerary for user"""
     try:
