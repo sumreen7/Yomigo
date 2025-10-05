@@ -22,7 +22,7 @@ const DestinationSelectionPage = () => {
     travel_month: ""
   });
   const [travelStyle, setTravelStyle] = useState("relaxed");
-  const [travelers, setTravelers] = useState("2");
+  const [travelers, setTravelers] = useState("1");
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [seasonalActivities, setSeasonalActivities] = useState(null);
   const [loadingActivities, setLoadingActivities] = useState(false);
