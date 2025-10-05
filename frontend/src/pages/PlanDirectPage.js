@@ -139,8 +139,8 @@ const PlanDirectPage = () => {
       return;
     }
 
-    if (!formData.destination_type || !formData.budget_range || !formData.travel_style) {
-      toast.error("Please fill in all required fields!");
+    if (!formData.budget_range || !formData.travel_style) {
+      toast.error("Please fill in budget range and travel style!");
       return;
     }
 
