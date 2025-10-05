@@ -13,10 +13,13 @@ const API = `${BACKEND_URL}/api`;
 
 const ItineraryPage = () => {
   const navigate = useNavigate();
+  const { user, saveItinerary, isAuthenticated } = useAuth();
   const [itineraryData, setItineraryData] = useState(null);
   const [localCurrency, setLocalCurrency] = useState("USD");
   const [convertedCosts, setConvertedCosts] = useState(null);
   const [currencyLoading, setCurrencyLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const storedItinerary = localStorage.getItem('generatedItinerary');
