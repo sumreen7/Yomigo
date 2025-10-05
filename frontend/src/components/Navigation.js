@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 
 const Navigation = () => {
   const location = useLocation();
+  const { user, logout, isAuthenticated, clearTripData } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Don't show navigation on homepage
