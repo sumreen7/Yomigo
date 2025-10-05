@@ -468,26 +468,95 @@ const PlanDirectPage = () => {
 
               {/* Activity Selection */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Activities You're Interested In</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Activities & Interests</h3>
                 <p className="text-sm text-gray-600 mb-4">Select activities you'd like to include in your itinerary (optional)</p>
-                <div className="flex flex-wrap gap-3">
-                  {activityOptions.map(activity => (
-                    <Badge
-                      key={activity}
-                      variant={formData.selected_activities.includes(activity) ? "default" : "outline"}
-                      className={`cursor-pointer px-4 py-2 text-base transition-all ${
-                        formData.selected_activities.includes(activity) 
-                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                          : 'hover:bg-emerald-50 hover:border-emerald-300'
-                      }`}
-                      onClick={() => toggleActivity(activity)}
-                    >
-                      {activity}
-                    </Badge>
-                  ))}
+                
+                {/* Seasonal Activities Section */}
+                {seasonalActivities && formData.travel_dates.travel_month && (
+                  <div className="mb-6">
+                    <h4 className="text-md font-medium text-emerald-700 mb-3 flex items-center gap-2">
+                      🌟 Perfect for {formData.travel_dates.travel_month} in {formData.destination}
+                      {loadingActivities && <Loader2 className="w-4 h-4 animate-spin" />}
+                    </h4>
+                    
+                    {/* Special Seasonal Activities */}
+                    {seasonalActivities.seasonal_activities && seasonalActivities.seasonal_activities.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm text-emerald-600 mb-2 font-medium">🎭 Seasonal Specials</p>
+                        <div className="flex flex-wrap gap-2">
+                          {seasonalActivities.seasonal_activities.map((activity, index) => (
+                            <Badge
+                              key={`seasonal-${index}`}
+                              variant={formData.selected_activities.includes(activity.name) ? "default" : "outline"}
+                              className={`cursor-pointer px-3 py-2 text-sm transition-all border-emerald-300 ${
+                                formData.selected_activities.includes(activity.name)
+                                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                                  : 'hover:bg-emerald-50 text-emerald-700'
+                              }`}
+                              onClick={() => toggleActivity(activity.name)}
+                              title={`${activity.description} - ${activity.cost} (${activity.why_this_month})`}
+                            >
+                              ✨ {activity.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Year-round Activities */}
+                    {seasonalActivities.year_round_activities && seasonalActivities.year_round_activities.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm text-gray-600 mb-2 font-medium">🏛️ Year-Round Favorites</p>
+                        <div className="flex flex-wrap gap-2">
+                          {seasonalActivities.year_round_activities.slice(0, 8).map((activity, index) => (
+                            <Badge
+                              key={`yearround-${index}`}
+                              variant={formData.selected_activities.includes(activity.name) ? "default" : "outline"}
+                              className={`cursor-pointer px-3 py-2 text-sm transition-all ${
+                                formData.selected_activities.includes(activity.name)
+                                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                  : 'hover:bg-blue-50 hover:border-blue-300'
+                              }`}
+                              onClick={() => toggleActivity(activity.name)}
+                              title={`${activity.description} - ${activity.cost}`}
+                            >
+                              {activity.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Default Activity Options */}
+                <div>
+                  <h4 className="text-md font-medium text-gray-700 mb-3">🎯 General Activities</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {defaultActivityOptions.map(activity => (
+                      <Badge
+                        key={activity}
+                        variant={formData.selected_activities.includes(activity) ? "default" : "outline"}
+                        className={`cursor-pointer px-4 py-2 text-base transition-all ${
+                          formData.selected_activities.includes(activity) 
+                            ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                            : 'hover:bg-gray-50 hover:border-gray-300'
+                        }`}
+                        onClick={() => toggleActivity(activity)}
+                      >
+                        {activity}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
+
+                <p className="text-sm text-gray-500 mt-3">
                   {formData.selected_activities.length} activities selected
+                  {seasonalActivities && (
+                    <span className="text-emerald-600 ml-2">
+                      • {seasonalActivities.seasonal_activities?.length || 0} seasonal options available
+                    </span>
+                  )}
                 </p>
               </div>
 
