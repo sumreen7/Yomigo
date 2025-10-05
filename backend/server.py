@@ -485,7 +485,12 @@ async def register_user(email: str, password: str, name: str):
         
         return {
             "success": True,
-            "user": {"id": user.id, "email": user.email, "name": user.name},
+            "user": {
+                "id": user.id, 
+                "email": user.email, 
+                "name": user.name,
+                "preferences": user.preferences
+            },
             "session_token": session_token
         }
         
