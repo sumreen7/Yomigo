@@ -778,11 +778,14 @@ async def get_destination_suggestions(
         Return JSON array:
         [{{
             "name": "City, Country",
-            "description": "Why it's perfect",
-            "best_months": ["Jan", "Feb"],
-            "avg_temp": "25°C",
-            "highlights": ["attraction1", "attraction2"],
-            "why_now": "Seasonal reason if travel_month specified"
+            "description": "Why it's perfect for this traveler",
+            "best_months": ["Jan", "Feb", "Mar"],
+            "avg_temp_range": "20-25°C",
+            "highlights": ["attraction1", "attraction2", "attraction3"],
+            "recommended_days": {{"min": 3, "ideal": 7, "max": 14}},
+            "why_now": "Seasonal reason if travel_month specified",
+            "budget_notes": "Budget-specific tips and cost estimates",
+            "local_currency": "USD"
         }}]
         """
         
