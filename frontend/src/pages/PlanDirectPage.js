@@ -376,7 +376,7 @@ const PlanDirectPage = () => {
                       <SelectValue placeholder="Auto-detect from destination" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">🤖 Auto-detect from destination</SelectItem>
+                      <SelectItem value="auto">🤖 Auto-detect from destination</SelectItem>
                       <SelectItem value="beach">🏖️ Beach & Coastal</SelectItem>
                       <SelectItem value="mountain">🏔️ Mountain & Hills</SelectItem>
                       <SelectItem value="city">🏙️ City & Urban</SelectItem>
