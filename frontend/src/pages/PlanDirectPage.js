@@ -451,7 +451,7 @@ const PlanDirectPage = () => {
                   </label>
                   <Select 
                     value={formData.travel_style} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, travel_style: value }))}
+                    onValueChange={handleTravelStyleChange}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select style" />
