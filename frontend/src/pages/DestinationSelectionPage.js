@@ -64,6 +64,36 @@ const DestinationSelectionPage = () => {
     );
   };
 
+  const getDurationRecommendation = async () => {
+    if (!destinationData?.selectedDestination?.name) return;
+    
+    setLoadingRecommendation(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('destination', destinationData.selectedDestination.name);
+      params.append('destination_type', destinationData.destinationType || 'city');
+      params.append('travel_style', travelStyle);
+      params.append('activities', selectedActivities.join(', '));
+      
+      const response = await axios.get(`${API}/duration-recommendation?${params.toString()}`);
+      
+      if (response.data.success) {
+        setDurationRecommendation(response.data.recommendation);
+      }
+    } catch (error) {
+      console.error('Failed to get duration recommendation:', error);
+    } finally {
+      setLoadingRecommendation(false);
+    }
+  };
+
+  // Get duration recommendation when destination loads or activities change
+  useEffect(() => {
+    if (destinationData?.selectedDestination) {
+      getDurationRecommendation();
+    }
+  }, [destinationData, selectedActivities, travelStyle]);
+
   const generateItinerary = async () => {
     if (!travelDates.start_date || !travelDates.end_date) {
       toast.error("Please select your travel dates!");
