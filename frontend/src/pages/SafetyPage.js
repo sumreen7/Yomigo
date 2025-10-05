@@ -125,11 +125,11 @@ const SafetyPage = () => {
           </Card>
         </div>
 
-        {/* Selected Tool Interface */}
+        {/* Destination Safety Interface */}
         <Card className="max-w-4xl mx-auto mb-8 shadow-xl">
           <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
             <CardTitle className="text-2xl text-center">
-              {selectedTool === 'destination' ? '🌍 Destination Safety Analysis' : '📝 Travel Review Analysis'}
+              🌍 Destination Safety & Review Analysis
             </CardTitle>
             <CardDescription className="text-center text-lg">
               {selectedTool === 'destination' 
