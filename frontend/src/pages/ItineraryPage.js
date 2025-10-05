@@ -214,6 +214,40 @@ const ItineraryPage = () => {
     navigate('/vibe-match');
   };
 
+  const handleSaveItinerary = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to save your itinerary");
+      navigate('/login');
+      return;
+    }
+
+    if (!itineraryData) {
+      toast.error("No itinerary to save");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const title = `${itineraryData.destination?.name || 'My Trip'} - ${calculateDuration()} days`;
+      
+      await saveItinerary(
+        title,
+        itineraryData.destination,
+        itineraryData.itinerary,
+        itineraryData.travelDates,
+        itineraryData.preferences
+      );
+      
+      setIsSaved(true);
+      toast.success("Itinerary saved successfully! 🎉");
+    } catch (error) {
+      console.error('Save failed:', error);
+      toast.error("Failed to save itinerary");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!itineraryData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
