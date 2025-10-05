@@ -220,3 +220,5 @@ test_plan:
 agent_communication:
     - agent: "main"
     - message: "Implemented currency selection system with global user preferences and enhanced destination suggestions. Ready for backend testing to verify API endpoints and then frontend testing for full user flow."
+    - agent: "testing"
+    - message: "Backend testing completed successfully. Fixed critical date calculation bug in session expiry. All user preferences and enhanced destination features are working correctly. User registration now includes default preferences, preferences can be updated and persist across sessions, and destination suggestions include all enhanced fields (recommended_days, best_months, avg_temp_range, highlights). All 17 backend API tests passed."
