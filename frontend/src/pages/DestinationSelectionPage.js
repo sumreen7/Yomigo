@@ -275,9 +275,76 @@ const DestinationSelectionPage = () => {
                   </div>
                 </div>
                 {travelDates.start_date && travelDates.end_date && (
-                  <p className="text-sm text-gray-600 mt-3 text-center">
-                    Perfect! Your {calculateDuration()}-day trip in {travelDates.travel_month}
-                  </p>
+                  <div className="text-center mt-4">
+                    <p className="text-sm text-gray-600">
+                      Perfect! Your {calculateDuration()}-day trip in {travelDates.travel_month}
+                    </p>
+                    
+                    {/* Duration Recommendation */}
+                    {durationRecommendation && (
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">💡 AI Duration Recommendation</h4>
+                        <div className="grid grid-cols-3 gap-2 mb-3">
+                          <div className="text-center">
+                            <div className="text-sm text-blue-600">Minimum</div>
+                            <div className="font-bold text-blue-800">{durationRecommendation.recommended_days?.minimum} days</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm text-emerald-600">Ideal</div>
+                            <div className="font-bold text-emerald-800">{durationRecommendation.recommended_days?.ideal} days</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm text-amber-600">Maximum</div>
+                            <div className="font-bold text-amber-800">{durationRecommendation.recommended_days?.maximum} days</div>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-blue-700">{durationRecommendation.reasoning}</p>
+                        
+                        {durationRecommendation.tips && durationRecommendation.tips.length > 0 && (
+                          <div className="mt-3">
+                            <p className="text-xs font-semibold text-blue-800 mb-1">Tips:</p>
+                            <ul className="text-xs text-blue-700 space-y-1">
+                              {durationRecommendation.tips.map((tip, index) => (
+                                <li key={index}>• {tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {/* Duration Warning */}
+                        {durationRecommendation.recommended_days && (
+                          <div className="mt-3">
+                            {calculateDuration() < durationRecommendation.recommended_days.minimum && (
+                              <div className="text-xs text-amber-700 bg-amber-100 p-2 rounded">
+                                ⚠️ Your trip might be too short to fully enjoy {destinationData.selectedDestination.name}
+                              </div>
+                            )}
+                            {calculateDuration() > durationRecommendation.recommended_days.maximum && (
+                              <div className="text-xs text-blue-700 bg-blue-100 p-2 rounded">
+                                ℹ️ You'll have plenty of time to deeply explore {destinationData.selectedDestination.name}
+                              </div>
+                            )}
+                            {calculateDuration() >= durationRecommendation.recommended_days.minimum && 
+                             calculateDuration() <= durationRecommendation.recommended_days.ideal && (
+                              <div className="text-xs text-green-700 bg-green-100 p-2 rounded">
+                                ✅ Perfect duration for experiencing {destinationData.selectedDestination.name}!
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {loadingRecommendation && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-center gap-2 text-gray-600">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Getting AI duration recommendation...
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
