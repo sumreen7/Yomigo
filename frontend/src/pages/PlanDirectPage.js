@@ -116,6 +116,41 @@ const PlanDirectPage = () => {
     }
   };
 
+  // Get destination highlights
+  const getDestinationHighlights = async (destination) => {
+    if (!destination || destination.length < 3) return;
+    
+    setLoadingHighlights(true);
+    try {
+      // Use the vibe match endpoint to get destination info
+      const vibePrompt = `I want to visit ${destination}`;
+      const preferences = {
+        destination_type: formData.destination_type || 'city',
+        budget_range: formData.budget_range || 'mid-range',
+        travel_style: formData.travel_style || 'relaxed'
+      };
+      
+      const params = new URLSearchParams();
+      params.append('vibe', vibePrompt);
+      params.append('preferences', JSON.stringify(preferences));
+      
+      const response = await axios.post(`${API}/vibe-match?${params.toString()}`);
+      
+      if (response.data.matched_destinations && response.data.matched_destinations.length > 0) {
+        // Find matching destination or use the first one
+        const matchedDest = response.data.matched_destinations.find(d => 
+          d.name.toLowerCase().includes(destination.toLowerCase())
+        ) || response.data.matched_destinations[0];
+        
+        setDestinationHighlights(matchedDest);
+      }
+    } catch (error) {
+      console.error("Failed to get destination highlights:", error);
+    } finally {
+      setLoadingHighlights(false);
+    }
+  };
+
   // Effect to fetch seasonal activities when destination and travel month change
   useEffect(() => {
     if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
