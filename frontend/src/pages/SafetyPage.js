@@ -43,7 +43,7 @@ const SafetyPage = () => {
     try {
       // Use the new destination reviews endpoint that fetches reviews automatically
       const params = new URLSearchParams();
-      params.append('destination', destinationQuery);
+      params.append('destination', queryDestination);
       params.append('review_type', 'all');
       
       const response = await axios.get(`${API}/destination-reviews?${params.toString()}`);
@@ -51,10 +51,10 @@ const SafetyPage = () => {
       if (response.data.success) {
         setResults({
           type: 'destination',
-          destination: destinationQuery,
+          destination: queryDestination,
           reviewData: response.data
         });
-        toast.success(`Found ${response.data.review_count} reviews for ${destinationQuery}!`);
+        toast.success(`Found ${response.data.review_count} reviews for ${queryDestination}!`);
       } else {
         toast.error("No reviews found for this destination");
       }
