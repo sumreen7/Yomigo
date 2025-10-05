@@ -52,30 +52,7 @@ const SafetyPage = () => {
     }
   };
 
-  const analyzeReview = async () => {
-    if (!reviewText.trim() || reviewText.trim().length < 10) {
-      toast.error("Please enter a review with at least 10 characters!");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.append('review_text', reviewText);
-      
-      const response = await axios.post(`${API}/analyze-review?${params.toString()}`);
-      setResults({
-        type: 'review',
-        analysis: response.data.analysis
-      });
-      toast.success("Review analysis completed!");
-    } catch (error) {
-      console.error("Review analysis error:", error);
-      toast.error("Failed to analyze review. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Function removed - now using automatic review fetching
 
   const getSentimentColor = (sentiment) => {
     switch (sentiment) {
