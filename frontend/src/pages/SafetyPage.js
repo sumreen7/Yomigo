@@ -139,74 +139,40 @@ const SafetyPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-8">
-            {selectedTool === 'destination' ? (
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Destination to Analyze 🗺️
-                  </label>
-                  <Input
-                    placeholder="e.g., Bangkok Thailand, Paris France, New York City, Bali Indonesia..."
-                    value={destinationQuery}
-                    onChange={(e) => setDestinationQuery(e.target.value)}
-                    className="text-base"
-                  />
-                </div>
-
-                <Button 
-                  onClick={checkDestinationSafety} 
-                  disabled={loading || !destinationQuery.trim()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 text-lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Analyzing Safety Information...
-                    </>
-                  ) : (
-                    <>
-                      <Shield className="w-5 h-5 mr-2" />
-                      Analyze Destination Safety
-                    </>
-                  )}
-                </Button>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Destination to Analyze 🌍
+                </label>
+                <Input
+                  placeholder="e.g., Tokyo, Japan or Bangkok, Thailand or Paris, France"
+                  value={destinationQuery}
+                  onChange={(e) => setDestinationQuery(e.target.value)}
+                  className="text-lg py-3"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Enter any destination for automated review analysis, safety scores, and hygiene ratings
+                </p>
               </div>
-            ) : (
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Travel Review to Analyze 📋
-                  </label>
-                  <Textarea
-                    placeholder="Paste a travel review here... (hotel review, restaurant review, destination experience, etc.)"
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    className="min-h-32 text-base"
-                  />
-                  <p className="text-sm text-gray-500 mt-2">
-                    {reviewText.length} characters (minimum 10 required)
-                  </p>
-                </div>
 
-                <Button 
-                  onClick={analyzeReview} 
-                  disabled={loading || reviewText.trim().length < 10}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 text-lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Analyzing Review...
-                    </>
-                  ) : (
-                    <>
-                      <Star className="w-5 h-5 mr-2" />
-                      Analyze Review Safety
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
+              <Button 
+                onClick={checkDestinationSafety} 
+                disabled={loading || !destinationQuery.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-4 text-lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Fetching Reviews & Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-5 h-5 mr-2" />
+                    Get Safety & Review Analysis
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
