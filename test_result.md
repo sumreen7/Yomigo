@@ -111,11 +111,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
         - agent: "main"
         - comment: "Extended User model to include preferences (currency, travel_style, budget). Added GET/POST endpoints for user preferences at /api/user/preferences. Updated auth responses to include user preferences."
+        - working: true
+        - agent: "testing"
+        - comment: "✅ BACKEND TESTED: Fixed critical date calculation bug in session expiry (line 482). All user preference endpoints working correctly: 1) User registration includes default preferences (USD, relaxed, mid-range), 2) GET /api/user/preferences returns user preferences, 3) POST /api/user/preferences successfully updates preferences, 4) Updated preferences persist across login sessions. All authentication flows include preferences in response."
 
   - task: "Enhanced Destination Suggestions"
     implemented: true
