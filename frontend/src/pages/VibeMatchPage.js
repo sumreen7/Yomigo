@@ -198,6 +198,52 @@ const VibeMatchPage = () => {
                         <p className="text-gray-700 text-lg mb-4 leading-relaxed">
                           {destination.description}
                         </p>
+
+                        {/* New Enhanced Information */}
+                        <div className="grid md:grid-cols-3 gap-4 mb-4">
+                          {/* Recommended Days */}
+                          {destination.recommended_days && (
+                            <div className="bg-blue-50 p-3 rounded-lg">
+                              <p className="text-blue-800 font-semibold text-sm mb-1">Recommended Stay</p>
+                              <p className="text-blue-700 text-sm">
+                                {destination.recommended_days.ideal} days ideal
+                              </p>
+                              <p className="text-blue-600 text-xs">
+                                ({destination.recommended_days.min}-{destination.recommended_days.max} days)
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Best Months */}
+                          {destination.best_months && (
+                            <div className="bg-green-50 p-3 rounded-lg">
+                              <p className="text-green-800 font-semibold text-sm mb-1">Best Time to Visit</p>
+                              <p className="text-green-700 text-sm">
+                                {destination.best_months.slice(0, 3).join(', ')}
+                              </p>
+                              {destination.avg_temp_range && (
+                                <p className="text-green-600 text-xs">
+                                  {destination.avg_temp_range}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Highlights */}
+                          {destination.highlights && (
+                            <div className="bg-amber-50 p-3 rounded-lg">
+                              <p className="text-amber-800 font-semibold text-sm mb-1">Top Highlights</p>
+                              <p className="text-amber-700 text-sm">
+                                {destination.highlights.slice(0, 2).join(', ')}
+                              </p>
+                              {destination.highlights.length > 2 && (
+                                <p className="text-amber-600 text-xs">
+                                  +{destination.highlights.length - 2} more
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         
                         <div className="bg-purple-50 p-4 rounded-lg">
                           <p className="text-purple-800 font-semibold mb-2">Perfect Match Because:</p>
