@@ -266,16 +266,17 @@ const PlanDirectPage = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Destination Type *
+                    Destination Type (Optional)
                   </label>
                   <Select 
                     value={formData.destination_type} 
                     onValueChange={(value) => setFormData(prev => ({ ...prev, destination_type: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose destination type" />
+                      <SelectValue placeholder="Auto-detect from destination" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="">🤖 Auto-detect from destination</SelectItem>
                       <SelectItem value="beach">🏖️ Beach & Coastal</SelectItem>
                       <SelectItem value="mountain">🏔️ Mountain & Hills</SelectItem>
                       <SelectItem value="city">🏙️ City & Urban</SelectItem>
@@ -285,6 +286,7 @@ const PlanDirectPage = () => {
                       <SelectItem value="island">🏝️ Island Paradise</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-gray-500 mt-1">We'll automatically detect the type from your destination</p>
                 </div>
 
                 <div>
