@@ -146,21 +146,21 @@ const PlanDirectPage = () => {
     }
   };
 
-  // Manual trigger functions for seasonal activities and recommendations
+  // Debounced triggers to prevent excessive API calls
   const handleDestinationChange = (newDestination) => {
     setFormData(prev => ({ ...prev, destination: newDestination }));
     
-    // Clear previous data
+    // Clear previous data when destination changes
     setSeasonalActivities(null);
     setDurationRecommendation(null);
     setDestinationHighlights(null);
     
-    // Trigger recommendations after a delay
+    // Trigger recommendations with debounce
     if (newDestination.length >= 3) {
       setTimeout(() => {
         getDurationRecommendation(newDestination);
         getDestinationHighlights(newDestination);
-      }, 1000);
+      }, 1500);
     }
   };
 
@@ -178,6 +178,17 @@ const PlanDirectPage = () => {
     if (formData.destination && updatedDates.travel_month && formData.travel_style) {
       setTimeout(() => {
         getSeasonalActivities(formData.destination, updatedDates.travel_month);
+      }, 800);
+    }
+  };
+
+  const handleTravelStyleChange = (newStyle) => {
+    setFormData(prev => ({ ...prev, travel_style: newStyle }));
+    
+    // Re-fetch seasonal activities if we have destination and dates
+    if (formData.destination && formData.travel_dates.travel_month) {
+      setTimeout(() => {
+        getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
       }, 500);
     }
   };
