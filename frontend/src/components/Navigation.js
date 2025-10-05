@@ -135,13 +135,41 @@ const Navigation = () => {
                         ? 'bg-gray-100 text-gray-900 font-semibold' 
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={item.onClick || (() => setMobileMenuOpen(false))}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? item.color : 'text-gray-500'}`} />
                     <span>{item.label}</span>
                   </Link>
                 );
               })}
+              
+              {/* Mobile Auth Controls */}
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                {isAuthenticated ? (
+                  <>
+                    <div className="flex items-center space-x-2 px-4 py-2 text-gray-700">
+                      <User className="w-5 h-5" />
+                      <span className="font-medium">{user?.name}</span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg w-full"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2 px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-lg"
+                  >
+                    <User className="w-5 h-5" />
+                    <span>Login</span>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}
