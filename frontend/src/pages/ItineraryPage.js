@@ -213,6 +213,21 @@ const ItineraryPage = () => {
     toast.success("Itinerary downloaded successfully!");
   };
 
+  const checkDestinationSafety = () => {
+    if (!itineraryData?.destination?.name) {
+      toast.error("No destination information available");
+      return;
+    }
+
+    // Store the destination in localStorage for the SafetyPage to pick up
+    localStorage.setItem('safety_destination_query', itineraryData.destination.name);
+    
+    // Navigate to safety page
+    navigate('/safety');
+    
+    toast.success(`Navigating to safety check for ${itineraryData.destination.name}`);
+  };
+
   const calculateDuration = () => {
     if (itineraryData?.travelDates?.start_date && itineraryData?.travelDates?.end_date) {
       const start = new Date(itineraryData.travelDates.start_date);
