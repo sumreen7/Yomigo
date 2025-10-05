@@ -24,10 +24,12 @@ const DestinationSelectionPage = () => {
   const [travelStyle, setTravelStyle] = useState("relaxed");
   const [travelers, setTravelers] = useState("2");
   const [selectedActivities, setSelectedActivities] = useState([]);
+  const [seasonalActivities, setSeasonalActivities] = useState(null);
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [durationRecommendation, setDurationRecommendation] = useState(null);
   const [loadingRecommendation, setLoadingRecommendation] = useState(false);
 
-  const activityOptions = [
+  const defaultActivityOptions = [
     "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
     "Shopping", "Beaches", "Hiking", "Photography", "Local Culture",
     "Art Galleries", "Historical Sites", "Nature Parks", "Boat Tours", "Walking Tours"
