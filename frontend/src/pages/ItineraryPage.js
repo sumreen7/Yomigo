@@ -17,6 +17,7 @@ const ItineraryPage = () => {
   const { user, saveItinerary, isAuthenticated } = useAuth();
   const [itineraryData, setItineraryData] = useState(null);
   const [localCurrency, setLocalCurrency] = useState("USD");
+  const [displayCurrency, setDisplayCurrency] = useState("USD");
   const [convertedCosts, setConvertedCosts] = useState(null);
   const [currencyLoading, setCurrencyLoading] = useState(false);
   const [saving, setSaving] = useState(false);
