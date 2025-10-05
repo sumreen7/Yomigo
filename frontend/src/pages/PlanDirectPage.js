@@ -67,7 +67,7 @@ const PlanDirectPage = () => {
   };
 
   // Fetch seasonal activities based on destination and travel month
-  const getSeasonalActivities = async (destination, month) => {
+  const getSeasonalActivities = useCallback(async (destination, month) => {
     if (!destination || !month || !formData.travel_style) return;
     
     setLoadingActivities(true);
@@ -91,10 +91,10 @@ const PlanDirectPage = () => {
     } finally {
       setLoadingActivities(false);
     }
-  };
+  }, [formData.travel_style, formData.budget_range]);
 
   // Get duration recommendation for the destination
-  const getDurationRecommendation = async (destination) => {
+  const getDurationRecommendation = useCallback(async (destination) => {
     if (!destination || destination.length < 3) return;
     
     setLoadingRecommendation(true);
@@ -114,10 +114,10 @@ const PlanDirectPage = () => {
     } finally {
       setLoadingRecommendation(false);
     }
-  };
+  }, [formData.travel_style, formData.travelers]);
 
   // Get destination highlights
-  const getDestinationHighlights = async (destination) => {
+  const getDestinationHighlights = useCallback(async (destination) => {
     if (!destination || destination.length < 3) return;
     
     setLoadingHighlights(true);
@@ -149,7 +149,7 @@ const PlanDirectPage = () => {
     } finally {
       setLoadingHighlights(false);
     }
-  };
+  }, [formData.destination_type, formData.budget_range, formData.travel_style]);
 
   // Effect to fetch seasonal activities when destination and travel month change
   useEffect(() => {
