@@ -164,6 +164,63 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const getUserPreferences = async () => {
+    if (!sessionToken) {
+      throw new Error('Must be logged in to get preferences');
+    }
+
+    try {
+      const params = new URLSearchParams();
+      params.append('session_token', sessionToken);
+      
+      const response = await axios.get(`${API}/user/preferences?${params.toString()}`);
+      return response.data.preferences;
+    } catch (error) {
+      console.error('Get preferences failed:', error);
+      throw error;
+    }
+  };
+
+  const updateUserPreferences = async (preferences) => {
+    if (!sessionToken) {
+      throw new Error('Must be logged in to update preferences');
+    }
+
+    try {
+      const params = new URLSearchParams();
+      params.append('session_token', sessionToken);
+      
+      // Add preference fields to params
+      if (preferences.preferred_currency) {
+        params.append('preferred_currency', preferences.preferred_currency);
+      }
+      if (preferences.travel_style) {
+        params.append('travel_style', preferences.travel_style);
+      }
+      if (preferences.budget_preference) {
+        params.append('budget_preference', preferences.budget_preference);
+      }
+      
+      const response = await axios.post(`${API}/user/preferences?${params.toString()}`);
+      
+      // Update local user state
+      if (response.data.success) {
+        setUser(prevUser => ({
+          ...prevUser,
+          preferences: {
+            ...prevUser.preferences,
+            ...preferences
+          }
+        }));
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Update preferences failed:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
