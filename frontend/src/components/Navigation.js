@@ -80,6 +80,14 @@ const Navigation = () => {
                     <span className="font-medium">{user?.name}</span>
                   </div>
                   <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPreferencesOpen(true)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                  <Button
                     variant="outline"
                     size="sm"
                     onClick={handleLogout}
