@@ -18,7 +18,7 @@ const PlanDirectPage = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     destination: "",
-    destination_type: "",
+    destination_type: "auto", // Default to auto-detect
     budget_range: "",
     travel_style: "",
     travelers: "1", // Fixed default to solo traveler
