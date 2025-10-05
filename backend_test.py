@@ -274,6 +274,304 @@ class WanderWiseAPITester:
         
         return success
 
+    def test_user_registration_with_preferences(self):
+        """Test user registration includes default preferences"""
+        # Generate unique email for testing
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        test_email = f"test_{timestamp}@example.com"
+        
+        params = {
+            'email': test_email,
+            'password': 'testpass123',
+            'name': 'Test User'
+        }
+        
+        success, response = self.run_test(
+            "User Registration with Preferences",
+            "POST",
+            "auth/register",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            user = response.get('user', {})
+            preferences = user.get('preferences', {})
+            session_token = response.get('session_token')
+            
+            print(f"   User ID: {user.get('id', 'N/A')}")
+            print(f"   Email: {user.get('email', 'N/A')}")
+            print(f"   Has Session Token: {bool(session_token)}")
+            print(f"   Default Currency: {preferences.get('preferred_currency', 'N/A')}")
+            print(f"   Default Travel Style: {preferences.get('travel_style', 'N/A')}")
+            print(f"   Default Budget: {preferences.get('budget_preference', 'N/A')}")
+            
+            # Store session token for further tests
+            self.test_session_token = session_token
+            self.test_user_email = test_email
+            
+            # Verify default preferences are set
+            expected_defaults = {
+                'preferred_currency': 'USD',
+                'travel_style': 'relaxed',
+                'budget_preference': 'mid-range'
+            }
+            
+            for key, expected_value in expected_defaults.items():
+                if preferences.get(key) != expected_value:
+                    print(f"   ⚠️  Default {key} is {preferences.get(key)}, expected {expected_value}")
+                    return False
+            
+            print("   ✅ All default preferences are correct")
+        
+        return success
+
+    def test_user_login_with_preferences(self):
+        """Test user login returns preferences"""
+        if not hasattr(self, 'test_user_email'):
+            print("   ⚠️  Skipping - No test user available from registration")
+            return True
+        
+        params = {
+            'email': self.test_user_email,
+            'password': 'testpass123'
+        }
+        
+        success, response = self.run_test(
+            "User Login with Preferences",
+            "POST",
+            "auth/login",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            user = response.get('user', {})
+            preferences = user.get('preferences', {})
+            session_token = response.get('session_token')
+            
+            print(f"   User ID: {user.get('id', 'N/A')}")
+            print(f"   Has Session Token: {bool(session_token)}")
+            print(f"   Currency: {preferences.get('preferred_currency', 'N/A')}")
+            print(f"   Travel Style: {preferences.get('travel_style', 'N/A')}")
+            print(f"   Budget: {preferences.get('budget_preference', 'N/A')}")
+            
+            # Update session token for further tests
+            self.test_session_token = session_token
+        
+        return success
+
+    def test_get_user_preferences(self):
+        """Test GET /api/user/preferences endpoint"""
+        if not hasattr(self, 'test_session_token'):
+            print("   ⚠️  Skipping - No session token available")
+            return True
+        
+        params = {
+            'session_token': self.test_session_token
+        }
+        
+        success, response = self.run_test(
+            "Get User Preferences",
+            "GET",
+            "user/preferences",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            preferences = response.get('preferences', {})
+            print(f"   Currency: {preferences.get('preferred_currency', 'N/A')}")
+            print(f"   Travel Style: {preferences.get('travel_style', 'N/A')}")
+            print(f"   Budget: {preferences.get('budget_preference', 'N/A')}")
+        
+        return success
+
+    def test_update_user_preferences(self):
+        """Test POST /api/user/preferences endpoint"""
+        if not hasattr(self, 'test_session_token'):
+            print("   ⚠️  Skipping - No session token available")
+            return True
+        
+        params = {
+            'session_token': self.test_session_token,
+            'preferred_currency': 'EUR',
+            'travel_style': 'adventure',
+            'budget_preference': 'luxury'
+        }
+        
+        success, response = self.run_test(
+            "Update User Preferences",
+            "POST",
+            "user/preferences",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            print(f"   Update Success: {response.get('success', 'N/A')}")
+            print(f"   Message: {response.get('message', 'N/A')}")
+        
+        return success
+
+    def test_verify_preferences_persistence(self):
+        """Test that updated preferences persist"""
+        if not hasattr(self, 'test_session_token'):
+            print("   ⚠️  Skipping - No session token available")
+            return True
+        
+        params = {
+            'session_token': self.test_session_token
+        }
+        
+        success, response = self.run_test(
+            "Verify Preferences Persistence",
+            "GET",
+            "user/preferences",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            preferences = response.get('preferences', {})
+            print(f"   Currency: {preferences.get('preferred_currency', 'N/A')}")
+            print(f"   Travel Style: {preferences.get('travel_style', 'N/A')}")
+            print(f"   Budget: {preferences.get('budget_preference', 'N/A')}")
+            
+            # Verify updated values
+            expected_updates = {
+                'preferred_currency': 'EUR',
+                'travel_style': 'adventure',
+                'budget_preference': 'luxury'
+            }
+            
+            for key, expected_value in expected_updates.items():
+                if preferences.get(key) != expected_value:
+                    print(f"   ❌ {key} is {preferences.get(key)}, expected {expected_value}")
+                    return False
+            
+            print("   ✅ All preferences updated correctly")
+        
+        return success
+
+    def test_enhanced_vibe_match(self):
+        """Test enhanced vibe-match with new fields"""
+        test_vibe = "I want somewhere with ancient temples and amazing street food"
+        
+        params = {
+            'vibe_query': test_vibe,
+            'destination_type': 'cultural',
+            'budget': 'mid-range'
+        }
+        
+        success, response = self.run_test(
+            "Enhanced Vibe Match with New Fields",
+            "POST",
+            "vibe-match",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            results = response.get('results', {})
+            destinations = results.get('matched_destinations', [])
+            
+            print(f"   Destinations Found: {len(destinations)}")
+            
+            if destinations:
+                first_dest = destinations[0]
+                print(f"   First Destination: {first_dest.get('name', 'N/A')}")
+                
+                # Check for enhanced fields
+                enhanced_fields = [
+                    'recommended_days',
+                    'best_months', 
+                    'avg_temp_range',
+                    'highlights'
+                ]
+                
+                missing_fields = []
+                for field in enhanced_fields:
+                    if field not in first_dest:
+                        missing_fields.append(field)
+                    else:
+                        print(f"   ✅ Has {field}: {first_dest[field]}")
+                
+                if missing_fields:
+                    print(f"   ❌ Missing enhanced fields: {missing_fields}")
+                    return False
+                
+                # Verify recommended_days structure
+                rec_days = first_dest.get('recommended_days', {})
+                if isinstance(rec_days, dict) and 'min' in rec_days and 'ideal' in rec_days and 'max' in rec_days:
+                    print(f"   ✅ Recommended days structure correct: {rec_days}")
+                else:
+                    print(f"   ❌ Recommended days structure incorrect: {rec_days}")
+                    return False
+                
+                # Verify best_months is array
+                best_months = first_dest.get('best_months', [])
+                if isinstance(best_months, list) and len(best_months) > 0:
+                    print(f"   ✅ Best months is array: {best_months}")
+                else:
+                    print(f"   ❌ Best months should be array: {best_months}")
+                    return False
+                
+                print("   ✅ All enhanced fields present and correctly structured")
+        
+        return success
+
+    def test_enhanced_destination_suggestions(self):
+        """Test enhanced destination-suggestions with new fields"""
+        params = {
+            'destination_type': 'beach',
+            'budget_range': 'mid-range',
+            'travel_style': 'relaxed',
+            'vibe': 'tropical paradise with great food',
+            'travel_month': 'April'
+        }
+        
+        success, response = self.run_test(
+            "Enhanced Destination Suggestions",
+            "POST",
+            "destination-suggestions",
+            200,
+            params=params
+        )
+        
+        if success and response:
+            destinations = response.get('destinations', [])
+            print(f"   Destinations Found: {len(destinations)}")
+            
+            if destinations:
+                first_dest = destinations[0]
+                print(f"   First Destination: {first_dest.get('name', 'N/A')}")
+                
+                # Check for enhanced fields
+                enhanced_fields = [
+                    'recommended_days',
+                    'best_months',
+                    'avg_temp_range', 
+                    'highlights',
+                    'why_now',
+                    'budget_notes'
+                ]
+                
+                missing_fields = []
+                for field in enhanced_fields:
+                    if field not in first_dest:
+                        missing_fields.append(field)
+                    else:
+                        print(f"   ✅ Has {field}: {first_dest[field]}")
+                
+                if missing_fields:
+                    print(f"   ❌ Missing enhanced fields: {missing_fields}")
+                    return False
+                
+                print("   ✅ All enhanced fields present")
+        
+        return success
+
 def main():
     print("🚀 Starting WanderWise AI Travel Platform API Tests")
     print("=" * 60)
