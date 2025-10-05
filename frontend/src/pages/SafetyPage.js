@@ -132,10 +132,7 @@ const SafetyPage = () => {
               🌍 Destination Safety & Review Analysis
             </CardTitle>
             <CardDescription className="text-center text-lg">
-              {selectedTool === 'destination' 
-                ? 'Enter any destination to get comprehensive safety insights'
-                : 'Paste a travel review to analyze safety, cleanliness, and sentiment'
-              }
+              Enter any destination to get comprehensive safety insights and automated review analysis
             </CardDescription>
           </CardHeader>
           <CardContent className="p-8">
