@@ -159,7 +159,12 @@ const PlanDirectPage = () => {
         travel_style: formData.travel_style,
         duration: duration,
         activities: formData.selected_activities,
-        vibe: `${formData.vibe} - specifically for ${formData.destination}`
+        vibe: `${formData.vibe} - specifically for ${formData.destination}`,
+        accommodation_preference: formData.accommodation_preference,
+        transport_preference: formData.transport_preference,
+        special_requirements: formData.special_requirements,
+        travel_month: formData.travel_dates.travel_month,
+        travelers: formData.travelers
       };
 
       console.log("Creating direct itinerary with preferences:", preferences);
