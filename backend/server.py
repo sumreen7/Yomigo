@@ -479,7 +479,7 @@ async def register_user(email: str, password: str, name: str):
             "user_id": user.id,
             "token": session_token,
             "created_at": datetime.utcnow(),
-            "expires_at": datetime.utcnow().replace(day=datetime.utcnow().day + 30)  # 30 day expiry
+            "expires_at": datetime.utcnow() + timedelta(days=30)  # 30 day expiry
         }
         await db.sessions.insert_one(session)
         
