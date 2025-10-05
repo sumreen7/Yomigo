@@ -810,9 +810,16 @@ async def get_destination_suggestions(
                 "name": f"Popular {destination_type.title()} Destination",
                 "description": f"Perfect for {travel_style} {budget_range} travelers",
                 "best_months": ["Apr", "May", "Sep", "Oct"],
-                "avg_temp": "22°C",
+                "avg_temp_range": "20-26°C",
                 "highlights": ["Local attractions", "Great food", "Beautiful scenery"],
-                "why_now": f"Great time for {travel_style} activities"
+                "recommended_days": {
+                    "min": 3 if destination_type == "city" else 5,
+                    "ideal": 7 if destination_type == "city" else 10,
+                    "max": 14 if destination_type == "city" else 21
+                },
+                "why_now": f"Great time for {travel_style} activities",
+                "budget_notes": f"Great {budget_range} options available",
+                "local_currency": "USD"
             }
         ]
         
