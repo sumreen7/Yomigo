@@ -29,6 +29,10 @@ const ItineraryPage = () => {
       const parsed = JSON.parse(storedItinerary);
       setItineraryData(parsed);
       
+      // Set display currency preference (user preference or local currency)
+      const userCurrency = user?.preferences?.preferred_currency || "USD";
+      setDisplayCurrency(userCurrency);
+      
       // Get local currency for destination
       if (parsed.destination?.name) {
         getDestinationCurrency(parsed.destination.name);
@@ -37,7 +41,16 @@ const ItineraryPage = () => {
       // If no itinerary, redirect to vibe match
       navigate('/vibe-match');
     }
-  }, [navigate]);
+  }, [navigate, user]);
+
+  // Convert costs when currency changes
+  useEffect(() => {
+    if (displayCurrency && itineraryData && displayCurrency !== "USD") {
+      convertCurrency(displayCurrency);
+    } else {
+      setConvertedCosts(null); // Show original costs
+    }
+  }, [displayCurrency, itineraryData]);
 
   const getDestinationCurrency = async (destination) => {
     try {
