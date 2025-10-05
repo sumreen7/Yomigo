@@ -12,7 +12,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const SafetyPage = () => {
-  const [selectedTool, setSelectedTool] = useState("destination");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
 
