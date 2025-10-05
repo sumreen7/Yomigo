@@ -558,7 +558,16 @@ async def verify_session(session_token: str):
         
         return {
             "success": True,
-            "user": {"id": user["id"], "email": user["email"], "name": user["name"]}
+            "user": {
+                "id": user["id"], 
+                "email": user["email"], 
+                "name": user["name"],
+                "preferences": user.get("preferences", {
+                    "preferred_currency": "USD",
+                    "travel_style": "relaxed", 
+                    "budget_preference": "mid-range"
+                })
+            }
         }
         
     except HTTPException:
