@@ -230,16 +230,33 @@ const PlanDirectPage = () => {
               
               {/* Destination & Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <MapPin className="w-4 h-4 inline mr-1" />
                     Destination *
                   </label>
                   <Input
-                    placeholder="e.g., Paris France, Tokyo Japan, New York City..."
+                    placeholder="e.g., Paris France, Tokyo Japan, New York City, Bali Indonesia..."
                     value={formData.destination}
                     onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
                     className="text-base"
                   />
+                  {durationRecommendation && (
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-blue-800 font-medium text-sm">
+                        💡 AI Recommendation: {durationRecommendation.ideal_days} days ideal for {formData.destination}
+                      </p>
+                      <p className="text-blue-600 text-xs mt-1">{durationRecommendation.reasoning}</p>
+                    </div>
+                  )}
+                  {loadingRecommendation && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Getting AI recommendations...
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -259,6 +276,29 @@ const PlanDirectPage = () => {
                       <SelectItem value="city">🏙️ City & Urban</SelectItem>
                       <SelectItem value="cultural">🏛️ Cultural & Historical</SelectItem>
                       <SelectItem value="adventure">🏃‍♂️ Adventure & Outdoors</SelectItem>
+                      <SelectItem value="nature">🌳 Nature & Wildlife</SelectItem>
+                      <SelectItem value="island">🏝️ Island Paradise</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Users className="w-4 h-4 inline mr-1" />
+                    Travelers
+                  </label>
+                  <Select 
+                    value={formData.travelers} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, travelers: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Solo Traveler</SelectItem>
+                      <SelectItem value="2">Couple (2 people)</SelectItem>
+                      <SelectItem value="3-4">Small Group (3-4 people)</SelectItem>
+                      <SelectItem value="5+">Large Group (5+ people)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
