@@ -154,15 +154,17 @@ const PlanDirectPage = () => {
   // Effect to fetch seasonal activities when destination and travel month change
   useEffect(() => {
     if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
+      console.log("Fetching activities for:", formData.destination, "in", formData.travel_dates.travel_month);
       getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
     }
   }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
 
-  // Effect to get duration recommendation when destination changes
+  // Effect to get duration recommendation and highlights when destination changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (formData.destination && formData.destination.length >= 3) {
         getDurationRecommendation(formData.destination);
+        getDestinationHighlights(formData.destination);
       }
     }, 1000); // Debounce by 1 second
 
