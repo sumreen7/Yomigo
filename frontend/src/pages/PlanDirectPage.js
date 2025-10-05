@@ -204,7 +204,7 @@ const PlanDirectPage = () => {
       const duration = calculateDuration();
       
       const preferences = {
-        destination_type: formData.destination_type,
+        destination_type: formData.destination_type === "auto" ? "" : formData.destination_type,
         budget_range: formData.budget_range,
         travel_style: formData.travel_style,
         duration: duration,
