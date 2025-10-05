@@ -360,6 +360,15 @@ const ItineraryPage = () => {
             <Download className="w-4 h-4" />
             Download Itinerary
           </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={checkDestinationSafety} 
+            className="flex items-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400"
+          >
+            <Shield className="w-4 h-4" />
+            Safety Check
+          </Button>
         </div>
 
         {/* Currency Selection */}
