@@ -519,18 +519,7 @@ const PlanDirectPage = () => {
                       type="date"
                       value={formData.travel_dates.start_date}
                       min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => {
-                        const startDate = e.target.value;
-                        const month = new Date(startDate).toLocaleDateString('en-US', { month: 'long' });
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          travel_dates: { 
-                            ...prev.travel_dates, 
-                            start_date: startDate,
-                            travel_month: month
-                          }
-                        }));
-                      }}
+                      onChange={(e) => handleDateChange('start_date', e.target.value)}
                       className="text-center"
                     />
                   </div>
@@ -540,13 +529,7 @@ const PlanDirectPage = () => {
                       type="date"
                       value={formData.travel_dates.end_date}
                       min={formData.travel_dates.start_date || new Date().toISOString().split('T')[0]}
-                      onChange={(e) => setFormData(prev => ({ 
-                        ...prev, 
-                        travel_dates: { 
-                          ...prev.travel_dates, 
-                          end_date: e.target.value
-                        }
-                      }))}
+                      onChange={(e) => handleDateChange('end_date', e.target.value)}
                       className="text-center"
                     />
                   </div>
