@@ -55,10 +55,10 @@ const SafetyPage = () => {
       if (response.data.success) {
         setResults({
           type: 'destination',
-          destination: queryDestination,
+          destination: destinationString,
           reviewData: response.data
         });
-        toast.success(`Found ${response.data.review_count} reviews for ${queryDestination}!`);
+        toast.success(`Found ${response.data.review_count} reviews for ${destinationString}!`);
       } else {
         toast.error("No reviews found for this destination");
       }
