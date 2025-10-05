@@ -217,7 +217,7 @@ const PlanDirectPage = () => {
         travelers: formData.travelers
       };
 
-      console.log("Creating direct itinerary with preferences:", preferences);
+      // Generate itinerary with collected preferences
 
       const response = await axios.post(`${API}/smart-itinerary`, preferences, {
         headers: { 'Content-Type': 'application/json' },
