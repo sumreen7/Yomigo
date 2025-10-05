@@ -711,9 +711,18 @@ async def get_my_itineraries(session_token: str):
             raise HTTPException(status_code=401, detail="Invalid session")
         
         # Get user's itineraries
-        itineraries = await db.saved_itineraries.find(
+        itineraries_raw = await db.saved_itineraries.find(
             {"user_id": session["user_id"]}
         ).sort("created_at", -1).to_list(50)
+        
+        # Convert ObjectIds to strings for JSON serialization
+        itineraries = []
+        for itinerary in itineraries_raw:
+            # Convert ObjectId to string if it exists
+            if '_id' in itinerary:
+                itinerary['id'] = str(itinerary['_id'])
+                del itinerary['_id']
+            itineraries.append(itinerary)
         
         return {
             "success": True,
