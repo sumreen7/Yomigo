@@ -14,10 +14,23 @@ const Navigation = () => {
     return null;
   }
 
+  const handleNewTrip = () => {
+    clearTripData(); // Clear previous trip data
+    setMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+  };
+
   const navItems = [
-    { path: '/vibe-match', icon: Heart, label: 'Vibe Match', color: 'text-purple-600' },
-    { path: '/plan-direct', icon: Calendar, label: 'Plan Trip', color: 'text-emerald-600' },
-    { path: '/itinerary', icon: Calendar, label: 'My Itinerary', color: 'text-emerald-600' },
+    { path: '/vibe-match', icon: Heart, label: 'Find Vibe', color: 'text-purple-600', onClick: handleNewTrip },
+    { path: '/plan-direct', icon: Calendar, label: 'Plan Trip', color: 'text-emerald-600', onClick: handleNewTrip },
+    ...(isAuthenticated ? [
+      { path: '/my-trips', icon: BookOpen, label: 'My Trips', color: 'text-blue-600' },
+      { path: '/itinerary', icon: Calendar, label: 'Current Trip', color: 'text-emerald-600' },
+    ] : []),
     { path: '/safety', icon: Shield, label: 'Safety Intel', color: 'text-blue-600' },
   ];
 
