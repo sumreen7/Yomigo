@@ -1071,10 +1071,10 @@ def is_valid_destination(destination: str) -> bool:
     """Check if destination appears to be a valid place name"""
     destination_lower = destination.lower().strip()
     
-    # Check for obviously invalid destinations (more permissive now)
+    # Check for obviously invalid destinations
     invalid_patterns = [
         r'^[xyz]+$',  # Just xyz, x, y, z combinations
-        r'^\d+$',     # Just numbers
+        r'^\d+$',     # Just numbers  
         r'^[!@#$%^&*()]+$',  # Just special characters
         r'^test$',    # test
         r'^example$', # example
@@ -1088,20 +1088,16 @@ def is_valid_destination(destination: str) -> bool:
         if re.match(pattern, destination_lower):
             return False
     
-    # Check minimum length (real place names are usually at least 2 characters)
+    # Very basic checks
     if len(destination_lower) < 2:
         return False
     
-    # Check for valid destination patterns (contains letters and optionally spaces/punctuation)
+    # Must contain at least some letters
     if not re.search(r'[a-zA-Z]', destination):
         return False
     
-    # Allow common destination formats: "New York", "New York City", "Paris, France", etc.
-    # Most real destinations contain letters and may have spaces, commas, periods
-    if re.match(r'^[a-zA-Z\s,.\-\']+$', destination):
-        return True
-    
-    return True  # Be more permissive for edge cases
+    # For now, accept anything that has letters and basic punctuation
+    return True
 
 @api_router.get("/destination-reviews", response_model=Dict[str, Any])
 async def get_destination_reviews(destination: str, review_type: str = "all"):
