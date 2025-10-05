@@ -671,14 +671,20 @@ async def save_itinerary(
         if not session:
             raise HTTPException(status_code=401, detail="Invalid session")
         
+        # Parse JSON strings
+        destination_dict = json.loads(destination) if isinstance(destination, str) else destination
+        itinerary_data_dict = json.loads(itinerary_data) if isinstance(itinerary_data, str) else itinerary_data
+        travel_dates_dict = json.loads(travel_dates) if isinstance(travel_dates, str) else travel_dates
+        preferences_dict = json.loads(preferences) if isinstance(preferences, str) else preferences
+        
         # Create saved itinerary
         saved_itinerary = SavedItinerary(
             user_id=session["user_id"],
             title=title,
-            destination=destination,
-            itinerary_data=itinerary_data,
-            travel_dates=travel_dates,
-            preferences=preferences
+            destination=destination_dict,
+            itinerary_data=itinerary_data_dict,
+            travel_dates=travel_dates_dict,
+            preferences=preferences_dict
         )
         
         await db.saved_itineraries.insert_one(saved_itinerary.dict())
