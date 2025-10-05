@@ -285,20 +285,68 @@ const PlanDirectPage = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
                     className="text-base"
                   />
-                  {durationRecommendation && (
-                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                      <p className="text-blue-800 font-medium text-sm">
-                        💡 AI Recommendation: {durationRecommendation.ideal_days} days ideal for {formData.destination}
-                      </p>
-                      <p className="text-blue-600 text-xs mt-1">{durationRecommendation.reasoning}</p>
-                    </div>
-                  )}
-                  {loadingRecommendation && (
-                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                  
+                  {/* Loading States */}
+                  {(loadingRecommendation || loadingHighlights) && (
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center text-gray-600 text-sm">
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Getting AI recommendations...
+                        Getting destination information...
                       </div>
+                    </div>
+                  )}
+
+                  {/* Destination Information Panel */}
+                  {(durationRecommendation || destinationHighlights) && !loadingRecommendation && !loadingHighlights && (
+                    <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg border border-blue-200">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        
+                        {/* Duration Recommendation */}
+                        {durationRecommendation && (
+                          <div>
+                            <h4 className="font-medium text-blue-800 text-sm mb-2">
+                              <Clock className="w-4 h-4 inline mr-1" />
+                              Recommended Duration
+                            </h4>
+                            <p className="text-blue-700 text-sm font-medium">
+                              {durationRecommendation.ideal_days || durationRecommendation.recommended_days?.ideal || '7'} days ideal
+                            </p>
+                            <p className="text-blue-600 text-xs mt-1">{durationRecommendation.reasoning}</p>
+                          </div>
+                        )}
+
+                        {/* Destination Highlights */}
+                        {destinationHighlights && (
+                          <div>
+                            <h4 className="font-medium text-emerald-800 text-sm mb-2">
+                              <Star className="w-4 h-4 inline mr-1" />
+                              Must-See Highlights
+                            </h4>
+                            {destinationHighlights.highlights && destinationHighlights.highlights.length > 0 ? (
+                              <div className="space-y-1">
+                                {destinationHighlights.highlights.slice(0, 3).map((highlight, index) => (
+                                  <p key={index} className="text-emerald-700 text-xs">• {highlight}</p>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-emerald-700 text-xs">Rich cultural experiences and attractions await!</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Best Time to Visit */}
+                      {destinationHighlights?.best_months && (
+                        <div className="mt-3 pt-3 border-t border-blue-200">
+                          <h4 className="font-medium text-purple-800 text-sm mb-1">
+                            🌟 Best Months to Visit
+                          </h4>
+                          <p className="text-purple-700 text-xs">
+                            {destinationHighlights.best_months.join(', ')} 
+                            {destinationHighlights.avg_temp_range && ` • ${destinationHighlights.avg_temp_range}`}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
