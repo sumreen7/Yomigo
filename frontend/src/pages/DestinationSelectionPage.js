@@ -47,6 +47,13 @@ const DestinationSelectionPage = () => {
     }
   }, [navigate]);
 
+  // Fetch seasonal activities when travel month changes
+  useEffect(() => {
+    if (travelDates.travel_month && destinationData?.selectedDestination?.name) {
+      getSeasonalActivities(travelDates.travel_month);
+    }
+  }, [travelDates.travel_month, destinationData?.selectedDestination?.name, travelStyle]);
+
   const calculateDuration = () => {
     if (travelDates.start_date && travelDates.end_date) {
       const start = new Date(travelDates.start_date);
