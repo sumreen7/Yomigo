@@ -131,7 +131,16 @@ async def analyze_travel_vibe(vibe_description: str, preferences: dict) -> Dict[
     2. vibe_score: How well you can match this vibe (0-1)
     3. reasoning: Why these destinations match the vibe
     
-    Each destination should have: name, country, description, why_it_matches, image_keywords
+    Each destination should have:
+    - name: Full destination name 
+    - country: Country name
+    - description: Brief compelling description
+    - why_it_matches: Why it matches the vibe
+    - image_keywords: Keywords for finding images
+    - recommended_days: Object with min/ideal/max days (e.g. {{"min": 3, "ideal": 7, "max": 14}})
+    - best_months: Array of best months to visit (e.g. ["Mar", "Apr", "May", "Sep", "Oct"])
+    - avg_temp_range: Temperature range during best months (e.g. "22-28°C")
+    - highlights: Array of top 3-4 attractions/activities
     """
     
     message = UserMessage(text=prompt)
