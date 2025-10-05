@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, Heart, Calendar, Shield, Menu, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { Sparkles, Heart, Calendar, Shield, Menu, X, User, LogOut, BookOpen } from "lucide-react";
 import { Button } from "./ui/button";
 
 const Navigation = () => {
