@@ -111,45 +111,18 @@ const SafetyPage = () => {
           </div>
         </div>
 
-        {/* Tool Selection */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card 
-              className={`cursor-pointer border-2 transition-all hover:shadow-lg ${
-                selectedTool === 'destination' 
-                  ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                  : 'border-gray-200 hover:border-blue-300'
-              }`}
-              onClick={() => setSelectedTool('destination')}
-            >
-              <CardContent className="p-8 text-center">
-                <MapPin className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-                <h3 className="text-xl font-semibold text-blue-800 mb-2">Destination Safety Check</h3>
-                <p className="text-blue-600 mb-4">Get comprehensive safety assessment for any destination worldwide</p>
-                <Badge className="bg-blue-600 text-white">
-                  {selectedTool === 'destination' ? 'Selected' : 'Click to Select'}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className={`cursor-pointer border-2 transition-all hover:shadow-lg ${
-                selectedTool === 'review' 
-                  ? 'border-indigo-500 bg-indigo-50 shadow-lg' 
-                  : 'border-gray-200 hover:border-indigo-300'
-              }`}
-              onClick={() => setSelectedTool('review')}
-            >
-              <CardContent className="p-8 text-center">
-                <Star className="w-12 h-12 mx-auto mb-4 text-indigo-600" />
-                <h3 className="text-xl font-semibold text-indigo-800 mb-2">Travel Review Analyzer</h3>
-                <p className="text-indigo-600 mb-4">Analyze safety & cleanliness insights from travel reviews, hotels, restaurants</p>
-                <Badge className="bg-indigo-600 text-white">
-                  {selectedTool === 'review' ? 'Selected' : 'Click to Select'}
-                </Badge>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Simplified - Only Destination Safety Check */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <Card className="border-2 border-blue-500 bg-blue-50 shadow-lg">
+            <CardContent className="p-8 text-center">
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+              <h3 className="text-xl font-semibold text-blue-800 mb-2">Destination Safety & Reviews</h3>
+              <p className="text-blue-600 mb-4">Get safety scores, hygiene ratings, and review analysis for any destination</p>
+              <Badge className="bg-blue-600 text-white">
+                Automated Review Analysis
+              </Badge>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Selected Tool Interface */}
