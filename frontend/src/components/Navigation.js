@@ -194,6 +194,14 @@ const Navigation = () => {
           </div>
         )}
       </div>
+      
+      {/* User Preferences Modal */}
+      {preferencesOpen && (
+        <UserPreferences 
+          isOpen={preferencesOpen}
+          onClose={() => setPreferencesOpen(false)}
+        />
+      )}
     </nav>
   );
 };
