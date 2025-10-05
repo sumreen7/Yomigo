@@ -18,7 +18,21 @@ const SafetyPage = () => {
   // Destination Safety Check
   const [destinationQuery, setDestinationQuery] = useState("");
 
-  const checkDestinationSafety = async () => {
+  useEffect(() => {
+    // Check if there's a pre-filled destination from itinerary
+    const storedDestination = localStorage.getItem('safety_destination_query');
+    if (storedDestination) {
+      setDestinationQuery(storedDestination);
+      // Clear the stored value
+      localStorage.removeItem('safety_destination_query');
+      // Auto-run the safety check
+      setTimeout(() => {
+        checkDestinationSafety(storedDestination);
+      }, 100);
+    }
+  }, []);
+
+  const checkDestinationSafety = async (destination = null) => {
     if (!destinationQuery.trim()) {
       toast.error("Please enter a destination!");
       return;
