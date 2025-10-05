@@ -24,6 +24,8 @@ const DestinationSelectionPage = () => {
   const [travelStyle, setTravelStyle] = useState("relaxed");
   const [travelers, setTravelers] = useState("2");
   const [selectedActivities, setSelectedActivities] = useState([]);
+  const [durationRecommendation, setDurationRecommendation] = useState(null);
+  const [loadingRecommendation, setLoadingRecommendation] = useState(false);
 
   const activityOptions = [
     "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
