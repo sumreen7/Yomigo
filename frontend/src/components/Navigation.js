@@ -162,6 +162,16 @@ const Navigation = () => {
                       <span className="font-medium">{user?.name}</span>
                     </div>
                     <button
+                      onClick={() => {
+                        setPreferencesOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-2 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg w-full"
+                    >
+                      <Settings className="w-5 h-5" />
+                      <span>Preferences</span>
+                    </button>
+                    <button
                       onClick={handleLogout}
                       className="flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg w-full"
                     >
