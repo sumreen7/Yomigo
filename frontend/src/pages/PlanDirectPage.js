@@ -545,34 +545,12 @@ const PlanDirectPage = () => {
                   </div>
                 </div>
 
-                {/* Duration Recommendations and Warnings */}
-                {formData.travel_dates.start_date && formData.travel_dates.end_date && formData.travel_dates.travel_month && (
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-600 text-center mb-3">
-                      Perfect! Your {calculateDuration()}-day trip to {formData.destination || 'your destination'} in {formData.travel_dates.travel_month}
+                {/* Duration Summary */}
+                {formData.travel_dates.start_date && formData.travel_dates.end_date && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                      Your {calculateDuration()}-day trip{formData.destination && ` to ${formData.destination}`}{formData.travel_dates.travel_month && ` in ${formData.travel_dates.travel_month}`}
                     </p>
-                    
-                    {/* Duration Warnings based on AI recommendation */}
-                    {durationRecommendation && (
-                      <div className="mt-3">
-                        {calculateDuration() < (durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days || 3) && (
-                          <div className="text-xs text-amber-700 bg-amber-100 p-3 rounded-lg">
-                            ⚠️ Your trip might be too short to fully enjoy {formData.destination}. Consider extending to at least {durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days} days.
-                          </div>
-                        )}
-                        {calculateDuration() > (durationRecommendation.recommended_days?.maximum || durationRecommendation.maximum_days || 21) && (
-                          <div className="text-xs text-blue-700 bg-blue-100 p-3 rounded-lg">
-                            ℹ️ You'll have plenty of time to deeply explore {formData.destination} and surrounding areas!
-                          </div>
-                        )}
-                        {calculateDuration() >= (durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days || 3) && 
-                         calculateDuration() <= (durationRecommendation.recommended_days?.ideal || durationRecommendation.ideal_days || 7) && (
-                          <div className="text-xs text-green-700 bg-green-100 p-3 rounded-lg">
-                            ✅ Perfect duration for experiencing the best of {formData.destination}!
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
