@@ -66,8 +66,8 @@ const PlanDirectPage = () => {
     }));
   };
 
-  // Fetch seasonal activities based on destination and travel month
-  const getSeasonalActivities = useCallback(async (destination, month) => {
+  // Simplified functions without useCallback to avoid dependency issues
+  const getSeasonalActivities = async (destination, month) => {
     if (!destination || !month || !formData.travel_style) return;
     
     setLoadingActivities(true);
@@ -87,14 +87,12 @@ const PlanDirectPage = () => {
       }
     } catch (error) {
       console.error("Failed to get seasonal activities:", error);
-      // Don't show error toast for seasonal activities as it's optional
     } finally {
       setLoadingActivities(false);
     }
-  }, [formData.travel_style, formData.budget_range]);
+  };
 
-  // Get duration recommendation for the destination
-  const getDurationRecommendation = useCallback(async (destination) => {
+  const getDurationRecommendation = async (destination) => {
     if (!destination || destination.length < 3) return;
     
     setLoadingRecommendation(true);
@@ -114,15 +112,13 @@ const PlanDirectPage = () => {
     } finally {
       setLoadingRecommendation(false);
     }
-  }, [formData.travel_style, formData.travelers]);
+  };
 
-  // Get destination highlights
-  const getDestinationHighlights = useCallback(async (destination) => {
+  const getDestinationHighlights = async (destination) => {
     if (!destination || destination.length < 3) return;
     
     setLoadingHighlights(true);
     try {
-      // Use the vibe match endpoint to get destination info
       const vibePrompt = `I want to visit ${destination}`;
       const preferences = {
         destination_type: formData.destination_type || 'city',
@@ -137,7 +133,6 @@ const PlanDirectPage = () => {
       const response = await axios.post(`${API}/vibe-match?${params.toString()}`);
       
       if (response.data.matched_destinations && response.data.matched_destinations.length > 0) {
-        // Find matching destination or use the first one
         const matchedDest = response.data.matched_destinations.find(d => 
           d.name.toLowerCase().includes(destination.toLowerCase())
         ) || response.data.matched_destinations[0];
@@ -149,16 +144,15 @@ const PlanDirectPage = () => {
     } finally {
       setLoadingHighlights(false);
     }
-  }, [formData.destination_type, formData.budget_range, formData.travel_style]);
+  };
 
-  // Effect to fetch seasonal activities when destination and travel month change
+  // Simple useEffect without complex dependencies
   useEffect(() => {
     if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
       getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
     }
-  }, [formData.destination, formData.travel_dates.travel_month, getSeasonalActivities]);
+  }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
 
-  // Effect to get duration recommendation and highlights when destination changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (formData.destination && formData.destination.length >= 3) {
@@ -168,7 +162,7 @@ const PlanDirectPage = () => {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.destination, getDurationRecommendation, getDestinationHighlights]);
+  }, [formData.destination]);
 
   const generateItinerary = async () => {
     // Validation
