@@ -226,53 +226,70 @@ const SafetyPage = () => {
                   <h4 className="font-semibold text-gray-800 mb-4">Cleanliness Score</h4>
                   <div className="flex items-center justify-center gap-3 mb-3">
                     {getScoreIcon(results.reviewData.aggregated_scores.average_cleanliness)}
-                    <div className={`text-4xl font-bold ${getScoreColor(results.analysis.cleanliness_score)}`}>
-                      {results.analysis.cleanliness_score}/10
+                    <div className={`text-4xl font-bold ${getScoreColor(results.reviewData.aggregated_scores.average_cleanliness)}`}>
+                      {results.reviewData.aggregated_scores.average_cleanliness}/10
                     </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div 
                       className="bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full transition-all duration-1000" 
-                      style={{ width: `${results.analysis.cleanliness_score * 10}%` }}
+                      style={{ width: `${results.reviewData.aggregated_scores.average_cleanliness * 10}%` }}
                     ></div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Key Insights */}
-            {results.analysis.key_insights && results.analysis.key_insights.length > 0 && (
-              <Card className="shadow-xl">
-                <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50">
-                  <CardTitle className="text-xl text-amber-800 flex items-center gap-3">
-                    <Shield className="w-6 h-6" />
-                    Key Safety Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="grid gap-4">
-                    {results.analysis.key_insights.map((insight, index) => (
-                      <div key={index} className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg">
-                        <Shield className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                        <p className="text-gray-700 leading-relaxed">{insight}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* AI Recommendation */}
-            {results.analysis.recommendation && (
+            {/* AI Summary */}
+            {results.reviewData.summary && (
               <Card className="shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
                   <CardTitle className="text-xl text-blue-800 flex items-center gap-3">
                     <Star className="w-6 h-6" />
-                    AI Recommendation
+                    AI Summary
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <p className="text-gray-700 text-lg leading-relaxed">{results.analysis.recommendation}</p>
+                  <p className="text-gray-700 text-lg leading-relaxed">{results.reviewData.summary}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Sample Reviews */}
+            {results.reviewData.detailed_analyses && results.reviewData.detailed_analyses.length > 0 && (
+              <Card className="shadow-xl">
+                <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50">
+                  <CardTitle className="text-xl text-amber-800 flex items-center gap-3">
+                    <Shield className="w-6 h-6" />
+                    Sample Review Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-6">
+                    {results.reviewData.detailed_analyses.slice(0, 3).map((reviewAnalysis, index) => (
+                      <div key={index} className="border-l-4 border-blue-400 pl-4 py-3 bg-blue-50 rounded-r-lg">
+                        <p className="text-gray-800 mb-3 italic">"{reviewAnalysis.review}"</p>
+                        <div className="flex flex-wrap gap-3">
+                          <Badge className={getSentimentColor(reviewAnalysis.analysis.overall_sentiment)}>
+                            {reviewAnalysis.analysis.overall_sentiment}
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            Safety: {reviewAnalysis.analysis.safety_score}/10
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            Cleanliness: {reviewAnalysis.analysis.cleanliness_score}/10
+                          </span>
+                        </div>
+                        {reviewAnalysis.analysis.key_insights && reviewAnalysis.analysis.key_insights.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-600">
+                              Key insights: {reviewAnalysis.analysis.key_insights.slice(0, 2).join(', ')}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             )}
