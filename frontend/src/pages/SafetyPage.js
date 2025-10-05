@@ -34,8 +34,12 @@ const SafetyPage = () => {
 
   const checkDestinationSafety = async (destination = null) => {
     const queryDestination = destination || destinationQuery.trim();
-    if (!queryDestination) {
-      toast.error("Please enter a destination!");
+    
+    // Ensure it's a string and not an object
+    const destinationString = typeof queryDestination === 'string' ? queryDestination : String(queryDestination);
+    
+    if (!destinationString || destinationString === '[object Object]') {
+      toast.error("Please enter a valid destination!");
       return;
     }
 
@@ -43,7 +47,7 @@ const SafetyPage = () => {
     try {
       // Use the new destination reviews endpoint that fetches reviews automatically
       const params = new URLSearchParams();
-      params.append('destination', queryDestination);
+      params.append('destination', destinationString);
       params.append('review_type', 'all');
       
       const response = await axios.get(`${API}/destination-reviews?${params.toString()}`);
