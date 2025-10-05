@@ -833,6 +833,96 @@ async def create_personalized_itinerary(preferences: TravelPreferences):
         logging.error(f"Itinerary creation error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Itinerary creation failed: {str(e)}")
 
+@api_router.get("/duration-recommendation", response_model=Dict[str, Any])
+async def get_duration_recommendation(
+    destination: str, 
+    destination_type: str = "city", 
+    travel_style: str = "relaxed", 
+    activities: str = ""
+):
+    """Get AI recommendation for ideal trip duration"""
+    try:
+        prompt = f"""
+        Recommend ideal trip duration for:
+        - Destination: {destination}
+        - Type: {destination_type}
+        - Style: {travel_style}
+        - Activities: {activities}
+        
+        Consider:
+        - Must-see attractions and time needed
+        - Travel style pace
+        - Activities requirements
+        - Local customs and logistics
+        
+        Provide JSON response:
+        {{
+            "recommended_days": {{
+                "minimum": 3,
+                "ideal": 7,
+                "maximum": 14
+            }},
+            "reasoning": "Why this duration works best",
+            "activity_breakdown": {{
+                "sightseeing": "2-3 days",
+                "cultural_immersion": "1-2 days"
+            }},
+            "tips": ["Tip 1", "Tip 2"]
+        }}
+        """
+        
+        message = UserMessage(text=prompt)
+        response = await openai_chat.send_message(message)
+        
+        try:
+            response_text = str(response)
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                recommendation = json.loads(json_match.group())
+                return {
+                    "success": True,
+                    "destination": destination,
+                    "recommendation": recommendation
+                }
+        except:
+            pass
+        
+        # Fallback recommendation based on destination type
+        fallback_durations = {
+            "city": {"minimum": 3, "ideal": 5, "maximum": 10},
+            "beach": {"minimum": 4, "ideal": 7, "maximum": 14},
+            "mountain": {"minimum": 5, "ideal": 8, "maximum": 21},
+            "cultural": {"minimum": 4, "ideal": 7, "maximum": 12},
+            "adventure": {"minimum": 7, "ideal": 10, "maximum": 21}
+        }
+        
+        duration = fallback_durations.get(destination_type, fallback_durations["city"])
+        
+        return {
+            "success": True,
+            "destination": destination,
+            "recommendation": {
+                "recommended_days": duration,
+                "reasoning": f"Based on typical {destination_type} destinations, {duration['ideal']} days allows for a good balance of exploration and relaxation.",
+                "activity_breakdown": {
+                    "exploration": "60% of time",
+                    "relaxation": "40% of time"
+                },
+                "tips": [
+                    f"Consider {duration['minimum']} days minimum to see key highlights",
+                    f"{duration['ideal']} days is ideal for a well-rounded experience",
+                    f"Up to {duration['maximum']} days if you want deep immersion"
+                ]
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Duration recommendation error: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 @api_router.get("/destination-reviews", response_model=Dict[str, Any])
 async def get_destination_reviews(destination: str, review_type: str = "all"):
     """Get aggregated reviews and analysis for a destination"""
