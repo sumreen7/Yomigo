@@ -33,7 +33,8 @@ const SafetyPage = () => {
   }, []);
 
   const checkDestinationSafety = async (destination = null) => {
-    if (!destinationQuery.trim()) {
+    const queryDestination = destination || destinationQuery.trim();
+    if (!queryDestination) {
       toast.error("Please enter a destination!");
       return;
     }
