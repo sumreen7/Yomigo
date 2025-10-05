@@ -295,7 +295,7 @@ const PlanDirectPage = () => {
                   <Input
                     placeholder="e.g., Paris France, Tokyo Japan, New York City, Bali Indonesia..."
                     value={formData.destination}
-                    onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
+                    onChange={(e) => handleDestinationChange(e.target.value)}
                     className="text-base"
                   />
                   
