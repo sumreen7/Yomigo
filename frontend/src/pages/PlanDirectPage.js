@@ -146,23 +146,25 @@ const PlanDirectPage = () => {
     }
   };
 
-  // Simple useEffect without complex dependencies
-  useEffect(() => {
-    if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
-      getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
-    }
-  }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
+  // Temporarily disabled useEffect hooks to fix loading issue
+  // TODO: Re-enable after fixing dependency issues
+  
+  // useEffect(() => {
+  //   if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
+  //     getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
+  //   }
+  // }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (formData.destination && formData.destination.length >= 3) {
-        getDurationRecommendation(formData.destination);
-        getDestinationHighlights(formData.destination);
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     if (formData.destination && formData.destination.length >= 3) {
+  //       getDurationRecommendation(formData.destination);
+  //       getDestinationHighlights(formData.destination);
+  //     }
+  //   }, 1000);
 
-    return () => clearTimeout(timeoutId);
-  }, [formData.destination]);
+  //   return () => clearTimeout(timeoutId);
+  // }, [formData.destination]);
 
   const generateItinerary = async () => {
     // Validation
