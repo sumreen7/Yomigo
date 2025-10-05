@@ -262,15 +262,17 @@ const PlanDirectPage = () => {
         </div>
 
         {/* Planning Form */}
-        <Card className="max-w-6xl mx-auto shadow-xl">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50">
-            <CardTitle className="text-3xl text-center">Create Your Perfect Itinerary</CardTitle>
-            <CardDescription className="text-center text-lg">
-              Fill in your travel details and preferences to get an AI-generated itinerary
+        <Card className="max-w-6xl mx-auto shadow-2xl border-0">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 via-blue-50 to-teal-50 border-b border-emerald-100">
+            <CardTitle className="text-3xl text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+              Create Your Perfect Itinerary
+            </CardTitle>
+            <CardDescription className="text-center text-lg text-gray-600">
+              Tell us about your dream trip and we'll craft a personalized itinerary with AI-powered recommendations
             </CardDescription>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="space-y-8">
+            <div className="space-y-10">
               
               {/* Destination & Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
