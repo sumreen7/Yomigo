@@ -231,6 +231,8 @@ export const AuthProvider = ({ children }) => {
     saveItinerary,
     getSavedItineraries,
     deleteItinerary,
+    getUserPreferences,
+    updateUserPreferences,
     isAuthenticated: !!user
   };
 
