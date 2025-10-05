@@ -146,25 +146,41 @@ const PlanDirectPage = () => {
     }
   };
 
-  // Temporarily disabled useEffect hooks to fix loading issue
-  // TODO: Re-enable after fixing dependency issues
-  
-  // useEffect(() => {
-  //   if (formData.destination && formData.travel_dates.travel_month && formData.travel_style) {
-  //     getSeasonalActivities(formData.destination, formData.travel_dates.travel_month);
-  //   }
-  // }, [formData.destination, formData.travel_dates.travel_month, formData.travel_style]);
+  // Manual trigger functions for seasonal activities and recommendations
+  const handleDestinationChange = (newDestination) => {
+    setFormData(prev => ({ ...prev, destination: newDestination }));
+    
+    // Clear previous data
+    setSeasonalActivities(null);
+    setDurationRecommendation(null);
+    setDestinationHighlights(null);
+    
+    // Trigger recommendations after a delay
+    if (newDestination.length >= 3) {
+      setTimeout(() => {
+        getDurationRecommendation(newDestination);
+        getDestinationHighlights(newDestination);
+      }, 1000);
+    }
+  };
 
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     if (formData.destination && formData.destination.length >= 3) {
-  //       getDurationRecommendation(formData.destination);
-  //       getDestinationHighlights(formData.destination);
-  //     }
-  //   }, 1000);
-
-  //   return () => clearTimeout(timeoutId);
-  // }, [formData.destination]);
+  const handleDateChange = (field, value) => {
+    const updatedDates = { ...formData.travel_dates, [field]: value };
+    
+    if (field === 'start_date' && value) {
+      const month = new Date(value).toLocaleDateString('en-US', { month: 'long' });
+      updatedDates.travel_month = month;
+    }
+    
+    setFormData(prev => ({ ...prev, travel_dates: updatedDates }));
+    
+    // Trigger seasonal activities if we have all required data
+    if (formData.destination && updatedDates.travel_month && formData.travel_style) {
+      setTimeout(() => {
+        getSeasonalActivities(formData.destination, updatedDates.travel_month);
+      }, 500);
+    }
+  };
 
   const generateItinerary = async () => {
     // Validation
