@@ -401,7 +401,10 @@ const PlanDirectPage = () => {
 
               {/* Travel Dates */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">📅 Travel Dates *</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  <Calendar className="w-5 h-5 inline mr-2" />
+                  Travel Dates *
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
@@ -451,6 +454,37 @@ const PlanDirectPage = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Duration Recommendations and Warnings */}
+                {formData.travel_dates.start_date && formData.travel_dates.end_date && formData.travel_dates.travel_month && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600 text-center mb-3">
+                      Perfect! Your {calculateDuration()}-day trip to {formData.destination || 'your destination'} in {formData.travel_dates.travel_month}
+                    </p>
+                    
+                    {/* Duration Warnings based on AI recommendation */}
+                    {durationRecommendation && (
+                      <div className="mt-3">
+                        {calculateDuration() < (durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days || 3) && (
+                          <div className="text-xs text-amber-700 bg-amber-100 p-3 rounded-lg">
+                            ⚠️ Your trip might be too short to fully enjoy {formData.destination}. Consider extending to at least {durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days} days.
+                          </div>
+                        )}
+                        {calculateDuration() > (durationRecommendation.recommended_days?.maximum || durationRecommendation.maximum_days || 21) && (
+                          <div className="text-xs text-blue-700 bg-blue-100 p-3 rounded-lg">
+                            ℹ️ You'll have plenty of time to deeply explore {formData.destination} and surrounding areas!
+                          </div>
+                        )}
+                        {calculateDuration() >= (durationRecommendation.recommended_days?.minimum || durationRecommendation.minimum_days || 3) && 
+                         calculateDuration() <= (durationRecommendation.recommended_days?.ideal || durationRecommendation.ideal_days || 7) && (
+                          <div className="text-xs text-green-700 bg-green-100 p-3 rounded-lg">
+                            ✅ Perfect duration for experiencing the best of {formData.destination}!
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Travel Vibe & Requirements */}
