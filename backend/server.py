@@ -161,7 +161,11 @@ async def analyze_travel_vibe(vibe_description: str, preferences: dict) -> Dict[
                         "country": "Indonesia", 
                         "description": "Tropical paradise with spiritual vibes",
                         "why_it_matches": "Perfect for the requested vibe",
-                        "image_keywords": "tropical beach temple"
+                        "image_keywords": "tropical beach temple",
+                        "recommended_days": {"min": 5, "ideal": 10, "max": 21},
+                        "best_months": ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+                        "avg_temp_range": "26-30°C",
+                        "highlights": ["Rice terraces", "Beach clubs", "Hindu temples", "Volcano hiking"]
                     }
                 ],
                 "vibe_score": 0.8,
