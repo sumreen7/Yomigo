@@ -37,6 +37,8 @@ const PlanDirectPage = () => {
   const [loadingRecommendation, setLoadingRecommendation] = useState(false);
   const [seasonalActivities, setSeasonalActivities] = useState(null);
   const [loadingActivities, setLoadingActivities] = useState(false);
+  const [destinationHighlights, setDestinationHighlights] = useState(null);
+  const [loadingHighlights, setLoadingHighlights] = useState(false);
 
   const defaultActivityOptions = [
     "Sightseeing", "Food Tours", "Adventure Sports", "Museums", "Nightlife", 
