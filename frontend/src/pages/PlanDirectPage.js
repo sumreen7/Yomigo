@@ -311,7 +311,7 @@ const PlanDirectPage = () => {
 
                   {/* Destination Information Panel */}
                   {(durationRecommendation || destinationHighlights) && !loadingRecommendation && !loadingHighlights && (
-                    <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg border border-blue-200">
+                    <div className="mt-3 p-4 bg-blue-50 rounded-lg border">
                       <div className="grid md:grid-cols-2 gap-4">
                         
                         {/* Duration Recommendation */}
@@ -350,7 +350,7 @@ const PlanDirectPage = () => {
 
                       {/* Best Time to Visit */}
                       {destinationHighlights?.best_months && (
-                        <div className="mt-3 pt-3 border-t border-blue-200">
+                        <div className="mt-3 pt-3 border-t">
                           <h4 className="font-medium text-purple-800 text-sm mb-1">
                             🌟 Best Months to Visit
                           </h4>
