@@ -303,6 +303,25 @@ const ItineraryPage = () => {
             <ArrowLeft className="w-4 h-4" />
             Find New Destination
           </Button>
+          
+          {/* Save Itinerary Button */}
+          {!itineraryData?.savedTripId && (
+            <Button 
+              onClick={handleSaveItinerary}
+              disabled={saving || isSaved}
+              className={`flex items-center gap-2 ${isSaved ? 'bg-green-600 hover:bg-green-700' : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700'} text-white`}
+            >
+              {saving ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : isSaved ? (
+                <BookmarkCheck className="w-4 h-4" />
+              ) : (
+                <Bookmark className="w-4 h-4" />
+              )}
+              {saving ? 'Saving...' : isSaved ? 'Saved!' : 'Save Trip'}
+            </Button>
+          )}
+          
           <Button variant="outline" onClick={shareItinerary} className="flex items-center gap-2">
             <Share className="w-4 h-4" />
             Share Itinerary
